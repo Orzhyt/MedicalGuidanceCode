@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能导诊助手 - Nocturne Glassmorphism</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* 噪点纹理 */
+  .noise{position:fixed;inset:0;opacity:.025;pointer-events:none;z-index:9999;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  /* 玻璃面板复用类 */
+  .glass-card{background:rgba(255,255,255,.08);backdrop-filter:blur(60px) saturate(180%);-webkit-backdrop-filter:blur(60px) saturate(180%);
+    border:1px solid rgba(255,255,255,.15);border-radius:24px;
+    box-shadow:0 16px 40px rgba(3,7,18,.5),inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(2,6,16,.35)}
+  .glass-card:hover{border-color:rgba(255,255,255,.3);
+    box-shadow:0 24px 64px rgba(3,7,18,.6),inset 0 1px 0 rgba(255,255,255,.32),inset 0 -1px 0 rgba(2,6,16,.35);
+    transform:translateY(-4px)}
+  .glass-panel{background:rgba(255,255,255,.05);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);
+    border:1px solid rgba(255,255,255,.15)}
+  .glass-input{background:rgba(255,255,255,.06);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);
+    border:1px solid rgba(255,255,255,.15);border-radius:16px;color:#fff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.15),inset 0 -1px 0 rgba(2,6,16,.3);
+    transition:all 500ms cubic-bezier(.16,1,.3,1)}
+  .glass-input:focus{outline:none;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.1);
+    box-shadow:0 0 0 3px rgba(228,184,99,.15),inset 0 1px 0 rgba(255,255,255,.25)}
+  .glass-input::placeholder{color:rgba(255,255,255,.35)}
+  .btn-gold{background:rgba(228,184,99,.15);border:1px solid rgba(228,184,99,.4);color:#F3DCA8;border-radius:16px;
+    box-shadow:0 4px 20px rgba(228,184,99,.15),inset 0 1px 0 rgba(243,220,168,.35);
+    transition:all 500ms cubic-bezier(.16,1,.3,1);cursor:pointer}
+  .btn-gold:hover{background:rgba(228,184,99,.22);border-color:rgba(228,184,99,.55);transform:translateY(-2px)}
+  .btn-glass{background:rgba(255,255,255,.1);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);
+    border:1px solid rgba(255,255,255,.2);border-radius:16px;color:#fff;
+    box-shadow:0 4px 16px rgba(3,7,18,.45),inset 0 1px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(2,6,16,.3);
+    transition:all 500ms cubic-bezier(.16,1,.3,1);cursor:pointer}
+  .btn-glass:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);transform:translateY(-2px)}
+  .tr{transition:all 500ms cubic-bezier(.16,1,.3,1)}
+  ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
+</style>
+</head>
+<body class="bg-[#0B1322] text-white min-h-screen overflow-hidden">
+
+<!-- 光源光斑 -->
+<div class="fixed -top-32 -right-20 w-[560px] h-[560px] rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(124,156,196,.28) 0%,transparent 65%)"></div>
+<div class="fixed -bottom-36 -left-24 w-[520px] h-[520px] rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(51,81,122,.35) 0%,transparent 65%)"></div>
+<div class="fixed top-1/2 left-1/2 w-[400px] h-[400px] rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none" style="background:radial-gradient(circle,rgba(228,184,99,.08) 0%,transparent 60%)"></div>
+<!-- 噪点 -->
+<div class="noise"></div>
+
+<div class="flex h-screen relative z-10">
+  <!-- ===== 侧边栏 ===== -->
+  <aside class="w-64 flex-shrink-0 flex flex-col gap-2 p-4 glass-panel border-r border-white/10">
+    <div class="flex items-center gap-3 px-3 pt-2 pb-6">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl btn-gold">+</div>
+      <div><div class="text-sm font-semibold text-white">智能导诊助手</div><div class="text-[11px] text-white/40">Medical Guidance</div></div>
+    </div>
+    <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl text-white/60 text-sm cursor-pointer tr border border-transparent active" data-view="chat">💬 医疗咨询</div>
+    <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl text-white/60 text-sm cursor-pointer tr border border-transparent" data-view="booking">📅 医生预约</div>
+    <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl text-white/60 text-sm cursor-pointer tr border border-transparent" data-view="auth">👤 注册/登录</div>
+    <div class="flex-1"></div>
+    <div class="glass-card p-4 rounded-2xl">
+      <div class="text-xs font-medium text-white">访客用户</div>
+      <div class="text-[11px] text-[#F3DCA8] mt-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#E4B863]" style="box-shadow:0 0 8px rgba(228,184,99,.5)"></span> 挂号系统已连接</div>
+    </div>
+  </aside>
+
+  <!-- ===== 主区域 ===== -->
+  <main class="flex-1 flex flex-col overflow-hidden p-6 gap-4">
+    <header class="flex items-center justify-between px-7 py-5 glass-card rounded-3xl">
+      <div><div class="text-lg font-semibold text-white" id="pageTitle">医疗咨询</div><div class="text-xs text-white/60 mt-1" id="pageSub">描述症状，AI 推荐科室并展示可约医生</div></div>
+      <div class="px-4 py-1.5 rounded-full text-xs font-medium btn-gold">在线</div>
+    </header>
+
+    <!-- View 1: 医疗咨询 -->
+    <section class="view flex-1 flex flex-col overflow-hidden glass-panel rounded-3xl" id="view-chat">
+      <div class="flex-1 overflow-y-auto p-7 space-y-6">
+        <!-- AI 欢迎 -->
+        <div class="flex gap-3.5"><div class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-sm text-[#F3DCA8] shrink-0">AI</div>
+          <div class="max-w-[70%] space-y-2"><div class="px-5 py-3.5 rounded-2xl glass-card text-sm leading-relaxed">您好！我是智能导诊助手。请描述您的不适症状，我会为您推荐合适的科室。</div><div class="text-[11px] text-white/40 px-1.5">09:01</div></div></div>
+        <!-- 用户消息 -->
+        <div class="flex gap-3.5 flex-row-reverse"><div class="w-10 h-10 rounded-full btn-gold flex items-center justify-center text-sm shrink-0">我</div>
+          <div class="max-w-[70%] space-y-2 flex flex-col items-end"><div class="px-5 py-3.5 rounded-2xl btn-gold text-sm leading-relaxed">我最近经常头痛，尤其是前额位置，还有点恶心</div><div class="text-[11px] text-white/40 px-1.5">09:02</div></div></div>
+        <!-- AI 追问 -->
+        <div class="flex gap-3.5"><div class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-sm text-[#F3DCA8] shrink-0">AI</div>
+          <div class="max-w-[70%] space-y-2"><div class="px-5 py-3.5 rounded-2xl glass-card text-sm leading-relaxed">头痛持续多久了？是持续性还是间歇性的？有没有伴随视力模糊？</div><div class="text-[11px] text-white/40 px-1.5">09:02</div></div></div>
+        <!-- 用户回复 -->
+        <div class="flex gap-3.5 flex-row-reverse"><div class="w-10 h-10 rounded-full btn-gold flex items-center justify-center text-sm shrink-0">我</div>
+          <div class="max-w-[70%] space-y-2 flex flex-col items-end"><div class="px-5 py-3.5 rounded-2xl btn-gold text-sm leading-relaxed">大概一周了，持续性的，没有视力模糊</div><div class="text-[11px] text-white/40 px-1.5">09:03</div></div></div>
+        <!-- AI 推荐 + 科室卡片 -->
+        <div class="flex gap-3.5"><div class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-sm text-[#F3DCA8] shrink-0">AI</div>
+          <div class="max-w-[70%] space-y-2.5">
+            <div class="px-5 py-3.5 rounded-2xl glass-card text-sm leading-relaxed">根据您的症状描述，建议您就诊神经内科。</div>
+            <div class="glass-card rounded-3xl p-5 flex items-start gap-4 group relative overflow-hidden">
+              <span class="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none rounded-3xl"></span>
+              <div class="w-12 h-12 rounded-2xl btn-gold flex items-center justify-center text-2xl shrink-0 relative z-10">🧠</div>
+              <div class="flex-1 relative z-10"><div class="text-base font-semibold text-white mb-1.5">神经内科</div><div class="text-xs text-white/60 leading-relaxed">脑血管病、癫痫、头痛、头晕等神经系统疾病</div>
+                <button class="btn-gold px-5 py-2 text-xs font-medium mt-3" onclick="switchView('booking')">查看医生 →</button></div>
+            </div>
+            <div class="text-[11px] text-white/40 px-1.5">09:03</div>
+          </div></div>
+        <!-- AI 医生列表 -->
+        <div class="flex gap-3.5"><div class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-sm text-[#F3DCA8] shrink-0">AI</div>
+          <div class="max-w-[70%] space-y-2.5">
+            <div class="px-5 py-3.5 rounded-2xl glass-card text-sm leading-relaxed">神经内科可预约的医生如下：</div>
+            <div class="space-y-3">
+              <div class="glass-card rounded-2xl p-4 flex items-center gap-3.5 group cursor-pointer relative overflow-hidden tr">
+                <span class="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/25 to-transparent group-hover:translate-x-[150%] transition-transform duration-700 ease-out pointer-events-none"></span>
+                <div class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-lg font-semibold shrink-0 relative z-10">周</div>
+                <div class="flex-1 relative z-10"><span class="text-sm font-semibold text-white">周明</span><span class="text-xs text-[#F3DCA8] ml-2">主任医师</span><div class="text-xs text-white/60 mt-1">擅长&zwj;擅长：脑血管病方向</div></div>
+                <div class="btn-gold px-4 py-1.5 text-xs relative z-10">预约 →</div>
+              </div>
+              <div class="glass-card rounded-2xl p-4 flex items-center gap-3.5 group cursor-pointer relative overflow-hidden tr">
+                <span class="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/25 to-transparent group-hover:translate-x-[150%] transition-transform duration-700 ease-out pointer-events-none"></span>
+                <div class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-lg font-semibold shrink-0 relative z-10">吴</div>
+                <div class="flex-1 relative z-10"><span class="text-sm font-semibold text-white">吴小燕</span><span class="text-xs text-[#F3DCA8] ml-2">副主任医师</span><div class="text-xs text-white/60 mt-1">擅长：呼吸内科方向</div></div>
+                <div class="btn-gold px-4 py-1.5 text-xs relative z-10">预约 →</div>
+              </div>
+            </div>
+            <div class="text-[11px] text-white/40 px-1.5">09:04</div>
+          </div></div>
+      </div>
+      <!-- 输入区 -->
+      <div class="p-5 border-t border-white/10 flex gap-3 items-end">
+        <textarea class="glass-input flex-1 px-5 py-3 text-sm resize-none h-12 font-inherit" placeholder="描述您的症状..."></textarea>
+        <button class="btn-gold w-12 h-12 rounded-2xl flex items-center justify-center text-xl">↑</button>
+      </div>
+    </section>
+
+    <!-- View 2: 医生预约 -->
+    <section class="view hidden flex-1 flex-col overflow-hidden glass-panel rounded-3xl" id="view-booking">
+      <div class="flex-1 overflow-y-auto p-7">
+        <h2 class="text-base font-semibold text-white mb-4">选择科室</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          <div class="glass-card rounded-3xl p-5 cursor-pointer group relative overflow-hidden tr" onclick="showDoctors(this)">
+            <span class="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none rounded-3xl"></span>
+            <div class="relative z-10"><div class="text-sm font-semibold text-white">神经内科</div><div class="text-xs text-white/50 mt-1.5 leading-relaxed">脑血管病、癫痫、头痛</div><div class="text-[11px] text-[#F3DCA8] mt-2">2 位医生可约</div></div>
+          </div>
+          <div class="glass-card rounded-3xl p-5 cursor-pointer group relative overflow-hidden tr">
+            <span class="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none rounded-3xl"></span>
+            <div class="relative z-10"><div class="text-sm font-semibold text-white">内科</div><div class="text-xs text-white/50 mt-1.5 leading-relaxed">消化、呼吸、心血管</div><div class="text-[11px] text-[#F3DCA8] mt-2">3 位医生可约</div></div>
+          </div>
+          <div class="glass-card rounded-3xl p-5 cursor-pointer group relative overflow-hidden tr">
+            <span class="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none rounded-3xl"></span>
+            <div class="relative z-10"><div class="text-sm font-semibold text-white">外科</div><div class="text-xs text-white/50 mt-1.5">普外、胸外、泌尿</div><div class="text-[11px] text-[#F3DCA8] mt-2">1 位医生可约</div></div>
+          </div>
+          <div class="glass-card rounded-3xl p-5 cursor-pointer group relative overflow-hidden tr">
+            <span class="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none rounded-3xl"></span>
+            <div class="relative z-10"><div class="text-sm font-semibold text-white">骨科</div><div class="text-xs text-white/50 mt-1.5">创伤、关节、脊柱</div><div class="text-[11px] text-[#F3DCA8] mt-2">1 位医生可约</div></div>
+          </div>
+          <div class="glass-card rounded-3xl p-5 cursor-pointer group relative overflow-hidden tr">
+            <span class="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none rounded-3xl"></span>
+            <div class="relative z-10"><div class="text-sm font-semibold text-white">儿科</div><div class="text-xs text-white/50 mt-1.5">儿童常见病与保健</div><div class="text-[11px] text-[#F3DCA8] mt-2">1 位医生可约</div></div>
+          </div>
+          <div class="glass-card rounded-3xl p-5 cursor-pointer group relative overflow-hidden tr">
+            <span class="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none rounded-3xl"></span>
+            <div class="relative z-10"><div class="text-sm font-semibold text-white">妇产科</div><div class="text-xs text-white/50 mt-1.5">妇科与产前产后</div><div class="text-[11px] text-[#F3DCA8] mt-2">1 位医生可约</div></div>
+          </div>
+        </div>
+        <div id="doctor-section" style="display:none">
+          <h2 class="text-base font-semibold text-white mb-4 mt-8">选择医生 — 神经内科</h2>
+          <div class="space-y-3 mb-8">
+            <div class="glass-card rounded-2xl p-4 flex items-center gap-3.5 cursor-pointer tr">
+              <div class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-lg font-semibold shrink-0">周</div>
+              <div class="flex-1"><span class="text-sm font-semibold text-white">周明</span><span class="text-xs text-[#F3DCA8] ml-2">主任医师</span><div class="text-xs text-white/60 mt-1">擅长：脑血管病方向</div></div>
+              <div class="btn-gold px-4 py-1.5 text-xs">查看排班 →</div>
+            </div>
+          </div>
+          <h2 class="text-base font-semibold text-white mb-4">可预约时段</h2>
+          <div class="space-y-2.5 mb-8">
+            <div class="text-xs font-medium text-white/60 py-1.5">10月21日 周二</div>
+            <div class="flex gap-2.5">
+              <div class="flex-1 glass-card rounded-2xl p-3 text-center cursor-pointer tr"><div class="text-xs font-medium text-white">上午 08:00-12:00</div><div class="text-[11px] text-[#F3DCA8] mt-1">余 2 号</div></div>
+              <div class="flex-1 glass-card rounded-2xl p-3 text-center opacity-40 cursor-not-allowed"><div class="text-xs font-medium text-white">下午 14:00-17:00</div><div class="text-[11px] text-red-400/60 mt-1">已满</div></div>
+            </div>
+            <div class="text-xs font-medium text-white/60 py-1.5">10月23日 周四</div>
+            <div class="flex gap-2.5">
+              <div class="flex-1 glass-card rounded-2xl p-3 text-center cursor-pointer tr"><div class="text-xs font-medium text-white">上午 08:00-12:00</div><div class="text-[11px] text-[#F3DCA8] mt-1">余 2 号</div></div>
+              <div class="flex-1 glass-card rounded-2xl p-3 text-center cursor-pointer tr"><div class="text-xs font-medium text-white">下午 14:00-17:00</div><div class="text-[11px] text-[#F3DCA8] mt-1">余 1 号</div></div>
+            </div>
+          </div>
+          <h2 class="text-base font-semibold text-white mb-4">预约确认</h2>
+          <div class="rounded-3xl p-5" style="background:rgba(228,184,99,.12);border:1px solid rgba(228,184,99,.35);box-shadow:0 4px 20px rgba(228,184,99,.15),inset 0 1px 0 rgba(243,220,168,.35)">
+            <div class="flex items-center gap-2 text-sm font-semibold text-[#F3DCA8] mb-4">✓ 预约成功</div>
+            <div class="flex justify-between py-2 text-xs border-b border-[#E4B863]/15"><span class="text-white/60">医院</span><span class="font-medium text-white">星海市中心医院</span></div>
+            <div class="flex justify-between py-2 text-xs border-b border-[#E4B863]/15"><span class="text-white/60">科室</span><span class="font-medium text-white">神经内科</span></div>
+            <div class="flex justify-between py-2 text-xs border-b border-[#E4B863]/15"><span class="text-white/60">医生</span><span class="font-medium text-white">周明 主任医师</span></div>
+            <div class="flex justify-between py-2 text-xs border-b border-[#E4B863]/15"><span class="text-white/60">日期</span><span class="font-medium text-white">2026年10月21日</span></div>
+            <div class="flex justify-between py-2 text-xs border-b border-[#E4B863]/15"><span class="text-white/60">时段</span><span class="font-medium text-white">上午 08:00-12:00</span></div>
+            <div class="flex justify-between py-2 text-xs"><span class="text-white/60">状态</span><span class="font-medium text-[#F3DCA8]">已确认</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 3: 注册/登录 -->
+    <section class="view hidden flex-1 flex-col items-center justify-center glass-panel rounded-3xl" id="view-auth">
+      <div class="glass-card rounded-3xl p-8 w-full max-w-md relative overflow-hidden">
+        <span class="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none rounded-3xl"></span>
+        <div class="relative z-10">
+          <h2 class="text-xl font-semibold text-white text-center mb-6">用户注册</h2>
+          <input class="glass-input w-full px-5 py-3.5 text-sm mb-4" placeholder="用户名">
+          <input class="glass-input w-full px-5 py-3.5 text-sm mb-4" type="password" placeholder="密码">
+          <input class="glass-input w-full px-5 py-3.5 text-sm mb-4" type="password" placeholder="确认密码">
+          <button class="btn-gold w-full py-3.5 text-sm font-medium">注册</button>
+          <div class="text-center text-xs text-white/40 mt-4">已有账号？<a class="text-[#F3DCA8] cursor-pointer">去登录</a></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<style>
+  .nav-item.active{background:rgba(228,184,99,.15);color:#F3DCA8;border-color:rgba(228,184,99,.4);box-shadow:0 4px 20px rgba(228,184,99,.15),inset 0 1px 0 rgba(243,220,168,.35)}
+  .nav-item:hover:not(.active){background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.15)}
+</style>
+<script>
+  function switchView(name){
+    document.querySelectorAll('.view').forEach(v=>{v.classList.remove('flex');v.classList.add('hidden')});
+    const el=document.getElementById('view-'+name);
+    el.classList.remove('hidden');el.classList.add('flex');
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.querySelector('[data-view="'+name+'"]').classList.add('active');
+    const t={chat:['医疗咨询','描述症状，AI 推荐科室并展示可约医生'],booking:['医生预约','选择科室和医生，查看排班并完成挂号'],auth:['注册/登录','创建账号或登录以使用预约功能']};
+    document.getElementById('pageTitle').textContent=t[name][0];
+    document.getElementById('pageSub').textContent=t[name][1];
+  }
+  document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>switchView(n.dataset.view)));
+  function showDoctors(tile){document.getElementById('doctor-section').style.display='block';tile.parentNode.style.display='none';}
+</script>
+</body>
+</html>

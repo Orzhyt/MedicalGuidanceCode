@@ -1,0 +1,69 @@
+<svg viewBox="0 0 680 430" width="100%" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>用户就诊流程时序图</title>
+  <defs>
+    <radialGradient id="s1" cx="85%" cy="8%" r="55%"><stop offset="0%" stop-color="#7C9CC4" stop-opacity="0.22"/><stop offset="100%" stop-color="#7C9CC4" stop-opacity="0"/></radialGradient>
+    <radialGradient id="s2" cx="8%" cy="92%" r="55%"><stop offset="0%" stop-color="#33517A" stop-opacity="0.28"/><stop offset="100%" stop-color="#33517A" stop-opacity="0"/></radialGradient>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round"/></marker>
+  </defs>
+  <rect width="680" height="430" fill="#0B1322"/>
+  <rect width="680" height="430" fill="url(#s1)"/>
+  <rect width="680" height="430" fill="url(#s2)"/>
+  <text x="340" y="20" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="14" font-weight="500">用户就诊流程时序图（Day 2 联调后完整流程）</text>
+  <rect x="45" y="35" width="60" height="22" rx="6" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="0.5"/>
+  <text x="75" y="46" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="11" font-weight="500">用户</text>
+  <rect x="200" y="35" width="80" height="22" rx="6" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="0.5"/>
+  <text x="240" y="46" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="11" font-weight="500">Next.js</text>
+  <rect x="380" y="35" width="80" height="22" rx="6" fill="#E4B863" fill-opacity="0.1" stroke="#E4B863" stroke-opacity="0.3" stroke-width="0.5"/>
+  <text x="420" y="46" text-anchor="middle" dominant-baseline="central" fill="#F3DCA8" font-size="11" font-weight="500">Dify</text>
+  <rect x="530" y="35" width="90" height="22" rx="6" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="0.5"/>
+  <text x="575" y="46" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="11" font-weight="500">挂号系统</text>
+  <line x1="75" y1="60" x2="75" y2="410" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="0.5" stroke-dasharray="3,2"/>
+  <line x1="240" y1="60" x2="240" y2="410" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="0.5" stroke-dasharray="3,2"/>
+  <line x1="420" y1="60" x2="420" y2="410" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="0.5" stroke-dasharray="3,2"/>
+  <line x1="575" y1="60" x2="575" y2="410" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="0.5" stroke-dasharray="3,2"/>
+  <rect x="30" y="62" width="610" height="62" rx="8" fill="#E4B863" fill-opacity="0.04"/>
+  <text x="38" y="74" dominant-baseline="central" fill="#F3DCA8" font-size="10" font-weight="500">Phase 1</text>
+  <text x="38" y="87" dominant-baseline="central" fill="#F3DCA8" font-size="9" opacity="0.7">页面① 症状→追问</text>
+  <path d="M75 80 L240 80" fill="none" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="157" y="75" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" fill-opacity="0.5" font-size="9">"头痛+恶心"</text>
+  <path d="M240 96 L420 96" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="330" y="91" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" fill-opacity="0.5" font-size="9">workflow①(消息)</text>
+  <path d="M420 112 L240 112" fill="none" stroke="#E4B863" stroke-opacity="0.5" stroke-width="1" marker-end="url(#ar)" stroke-dasharray="3,2"/>
+  <text x="330" y="107" text-anchor="middle" dominant-baseline="central" fill="#E4B863" fill-opacity="0.7" font-size="9">{reply:"头痛多久了？"}</text>
+  <rect x="30" y="130" width="610" height="80" rx="8" fill="#E4B863" fill-opacity="0.04"/>
+  <text x="38" y="142" dominant-baseline="central" fill="#F3DCA8" font-size="10" font-weight="500">Phase 2</text>
+  <text x="38" y="155" dominant-baseline="central" fill="#F3DCA8" font-size="9" opacity="0.7">页面① 推荐+医生</text>
+  <path d="M75 148 L240 148" fill="none" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="157" y="143" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" fill-opacity="0.5" font-size="9">"一周了"</text>
+  <path d="M240 166 L420 166" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="330" y="161" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" fill-opacity="0.5" font-size="9">workflow①(消息+历史)</text>
+  <path d="M420 184 L575 184" fill="none" stroke="#E4B863" stroke-opacity="0.5" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="497" y="179" text-anchor="middle" dominant-baseline="central" fill="#E4B863" fill-opacity="0.7" font-size="9">GET /api/hospitals</text>
+  <path d="M420 200 L240 200" fill="none" stroke="#E4B863" stroke-opacity="0.5" stroke-width="1" marker-end="url(#ar)" stroke-dasharray="3,2"/>
+  <text x="330" y="195" text-anchor="middle" dominant-baseline="central" fill="#E4B863" fill-opacity="0.7" font-size="9">{reply, department, doctors[]}</text>
+  <rect x="30" y="218" width="610" height="18" rx="6" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="0.5"/>
+  <text x="340" y="227" text-anchor="middle" dominant-baseline="central" fill="#F3DCA8" font-size="10" font-weight="500">用户点击"查看医生" → 切换到页面② 医生预约</text>
+  <rect x="30" y="242" width="610" height="80" rx="8" fill="#E4B863" fill-opacity="0.04"/>
+  <text x="38" y="254" dominant-baseline="central" fill="#F3DCA8" font-size="10" font-weight="500">Phase 3</text>
+  <text x="38" y="267" dominant-baseline="central" fill="#F3DCA8" font-size="9" opacity="0.7">页面② 选医生→排班</text>
+  <path d="M75 260 L240 260" fill="none" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="157" y="255" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" fill-opacity="0.5" font-size="9">"选周明医生"</text>
+  <path d="M240 278 L420 278" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="330" y="273" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" fill-opacity="0.5" font-size="9">workflow②(医生ID)</text>
+  <path d="M420 296 L575 296" fill="none" stroke="#E4B863" stroke-opacity="0.5" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="497" y="291" text-anchor="middle" dominant-baseline="central" fill="#E4B863" fill-opacity="0.7" font-size="9">GET /api/doctors/6/slots</text>
+  <path d="M420 312 L240 312" fill="none" stroke="#E4B863" stroke-opacity="0.5" stroke-width="1" marker-end="url(#ar)" stroke-dasharray="3,2"/>
+  <text x="330" y="307" text-anchor="middle" dominant-baseline="central" fill="#E4B863" fill-opacity="0.7" font-size="9">{reply, slots[]}</text>
+  <rect x="30" y="330" width="610" height="80" rx="8" fill="#E4B863" fill-opacity="0.04"/>
+  <text x="38" y="342" dominant-baseline="central" fill="#F3DCA8" font-size="10" font-weight="500">Phase 4</text>
+  <text x="38" y="355" dominant-baseline="central" fill="#F3DCA8" font-size="9" opacity="0.7">页面② 选时段→挂号</text>
+  <path d="M75 348 L240 348" fill="none" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="157" y="343" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" fill-opacity="0.5" font-size="9">"10月21日上午"</text>
+  <path d="M240 366 L420 366" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="330" y="361" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" fill-opacity="0.5" font-size="9">workflow②(预约请求)</text>
+  <path d="M420 384 L575 384" fill="none" stroke="#E4B863" stroke-opacity="0.5" stroke-width="1" marker-end="url(#ar)"/>
+  <text x="497" y="379" text-anchor="middle" dominant-baseline="central" fill="#E4B863" fill-opacity="0.7" font-size="9">POST /api/appointments</text>
+  <path d="M420 400 L240 400" fill="none" stroke="#E4B863" stroke-opacity="0.5" stroke-width="1" marker-end="url(#ar)" stroke-dasharray="3,2"/>
+  <text x="330" y="395" text-anchor="middle" dominant-baseline="central" fill="#E4B863" fill-opacity="0.7" font-size="9">{reply, appointment}</text>
+  <text x="340" y="422" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" fill-opacity="0.35" font-size="10">Day 1: Dify=Mock（假数据） → Day 2: Dify=真实工作流（LLM+HTTP调挂号系统） → 联调: Mock替换为Dify</text>
+</svg>

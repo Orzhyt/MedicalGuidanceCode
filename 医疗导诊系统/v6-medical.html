@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V6 · 医疗健康 / Clinical 风格</title>
+<style>
+/* ============================================================
+   DESIGN TOKENS —— 学员请从这一段开始提取
+   风格：医疗健康 / Clinical
+   核心原则：风格服从可读性与风险表达，不做视觉炫技
+   四个医疗特有变量：
+     1) 风险三级语义色（正常 / 注意 / 警示）—— 不是装饰，是信息
+     2) 免责声明条 —— 常驻，不可关闭
+     3) 循证来源行 —— AI 回答必须可溯源
+     4) 指标卡 —— 数字优先、单位次之、状态点最次
+   ============================================================ */
+:root{
+  /* 底色：冷调浅蓝灰，比纯白降低眩光，长时间阅读更稳 */
+  --bg:        #eef3f9;
+  --surface:   #ffffff;
+  --surface-2: #f7fafd;
+
+  --border:        #e1e9f3;
+  --border-strong: #cdd9e9;
+
+  /* 文字：不用纯黑，深海军蓝更可信、也更柔和 */
+  --text-1: #0f2338;
+  --text-2: #54708c;
+  --text-3: #8ba1b8;
+
+  /* 主色：医疗蓝。克制使用，只出现在可交互与关键信息上 */
+  --primary:      #1668e3;
+  --primary-ink:  #0b4aa8;
+  --primary-soft: #e9f1fd;
+  --primary-line: #c7ddfb;
+
+  /* 风险三级：这是医疗页面的核心语义系统 */
+  --ok:        #0d9f6e;
+  --ok-soft:   #e6f7f0;
+  --ok-line:   #b6e8d5;
+
+  --warn:      #b0740a;
+  --warn-soft: #fdf4e3;
+  --warn-line: #f2ddb4;
+
+  --danger:      #cf3b3b;
+  --danger-soft: #fdeeee;
+  --danger-line: #f7c9c9;
+
+  /* 圆角：中等偏方，精确感优先于亲和感 */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --pill: 999px;
+
+  /* 阴影：极浅、单层，医疗界面不应该有强投影 */
+  --shadow-card: 0 1px 2px rgba(15,35,56,.05), 0 10px 28px -16px rgba(15,35,56,.16);
+
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  /* 可读性：字号略大、行高略松，是医疗界面的硬要求 */
+  --fs-body: 15px;
+  --lh-body: 1.8;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+*{ margin:0; padding:0; }
+
+html,body{ height:100%; }
+
+body{
+  background:var(--bg);
+  color:var(--text-1);
+  font-family:var(--font);
+  font-size:var(--fs-body);
+  line-height:var(--lh-body);
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ===================== 外壳 ===================== */
+.wrap{
+  height:100vh;
+  padding:18px;
+  max-width:1280px;
+  margin:0 auto;
+  display:flex;
+}
+
+.app{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:0;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-card);
+  overflow:hidden;
+}
+
+/* ===================== 免责声明条 ===================== */
+.disclaimer{
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px 18px;
+  background:var(--primary-soft);
+  border-bottom:1px solid var(--primary-line);
+  font-size:12.5px;
+  line-height:1.5;
+  color:var(--primary-ink);
+}
+.disclaimer svg{ flex:none; opacity:.85; }
+.disclaimer b{ font-weight:600; }
+.disclaimer .more{
+  margin-left:auto;
+  font-size:12px;
+  color:var(--primary-ink);
+  text-decoration:none;
+  border-bottom:1px solid rgba(11,74,168,.28);
+  white-space:nowrap;
+  cursor:pointer;
+}
+
+/* ===================== 内部两栏 ===================== */
+.body{
+  flex:1;
+  display:grid;
+  grid-template-columns:296px 1fr;
+  min-height:0;
+}
+
+/* ===================== 左栏：患者信息 ===================== */
+.rail{
+  background:var(--surface-2);
+  border-right:1px solid var(--border);
+  padding:18px 16px;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  overflow-y:auto;
+  scrollbar-width:thin;
+}
+.rail::-webkit-scrollbar{ width:8px; }
+.rail::-webkit-scrollbar-thumb{ background:var(--border-strong); border-radius:4px; }
+
+.patient{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+.p-avatar{
+  width:42px; height:42px;
+  border-radius:50%;
+  background:var(--primary-soft);
+  border:1px solid var(--primary-line);
+  color:var(--primary-ink);
+  display:grid; place-items:center;
+  font-size:14px; font-weight:600;
+  flex:none;
+}
+.p-name{ font-size:15px; font-weight:600; letter-spacing:-.01em; }
+.p-meta{ font-size:12.5px; color:var(--text-3); }
+
+.sec-label{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:16px 2px 10px;
+  font-size:11.5px;
+  font-weight:600;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  color:var(--text-3);
+}
+.sec-label .sync{
+  margin-left:auto;
+  font-size:10.5px;
+  font-weight:400;
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--text-3);
+}
+
+/* 指标卡：数字优先，单位次之，状态点最次 */
+.vitals{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.vital{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  padding:10px 11px;
+}
+.vital .k{
+  display:flex; align-items:center; gap:5px;
+  font-size:11.5px;
+  color:var(--text-3);
+  margin-bottom:3px;
+}
+.vital .k i{
+  width:5px; height:5px;
+  border-radius:50%;
+  background:var(--ok);
+  flex:none;
+}
+.vital.warn .k i{ background:var(--warn); }
+.vital .v{
+  display:flex;
+  align-items:baseline;
+  gap:3px;
+  font-variant-numeric:tabular-nums;
+}
+.vital .n{
+  font-size:19px;
+  font-weight:600;
+  letter-spacing:-.02em;
+  line-height:1.2;
+}
+.vital .u{ font-size:10.5px; color:var(--text-3); }
+
+/* 既往史 */
+.history{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  padding:11px 12px;
+  font-size:13px;
+  color:var(--text-2);
+  line-height:1.65;
+}
+.history div + div{ margin-top:5px; }
+.history b{ color:var(--text-1); font-weight:600; }
+
+/* 快捷入口 */
+.quick{ display:flex; flex-direction:column; gap:2px; }
+.q-item{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:8px 9px;
+  border-radius:var(--r-sm);
+  color:var(--text-2);
+  font-size:13.5px;
+  cursor:pointer;
+  transition:background .14s, color .14s;
+}
+.q-item:hover{ background:var(--primary-soft); color:var(--primary-ink); }
+.q-item .ico{ width:16px; flex:none; opacity:.8; }
+.q-item .cnt{
+  margin-left:auto;
+  font-size:11px;
+  color:var(--text-3);
+  font-variant-numeric:tabular-nums;
+}
+
+.rail-foot{
+  margin-top:auto;
+  padding-top:14px;
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:11.5px;
+  color:var(--text-3);
+}
+
+/* ===================== 右栏：对话 ===================== */
+.main{ display:flex; flex-direction:column; min-width:0; min-height:0; }
+
+.topbar{
+  flex:none;
+  height:62px;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:0 20px;
+  border-bottom:1px solid var(--border);
+}
+.tb-left{ min-width:0; }
+.tb-title{
+  display:flex; align-items:center; gap:8px;
+  font-size:15px;
+  font-weight:600;
+  letter-spacing:-.01em;
+}
+.badge-ai{
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--primary-ink);
+  background:var(--primary-soft);
+  border:1px solid var(--primary-line);
+  border-radius:4px;
+  padding:1px 6px;
+}
+.tb-sub{ font-size:12px; color:var(--text-3); }
+
+.tb-right{ margin-left:auto; display:flex; align-items:center; gap:8px; }
+.btn-ghost{
+  height:32px;
+  padding:0 12px;
+  border:1px solid var(--border-strong);
+  background:var(--surface);
+  border-radius:var(--r-sm);
+  color:var(--text-2);
+  font-family:inherit;
+  font-size:13px;
+  cursor:pointer;
+  display:flex; align-items:center; gap:6px;
+  transition:border-color .14s, color .14s, background .14s;
+}
+.btn-ghost:hover{ border-color:var(--primary-line); color:var(--primary-ink); background:var(--primary-soft); }
+
+/* 对话滚动区 */
+.chat{
+  flex:1;
+  overflow-y:auto;
+  padding:24px 24px 6px;
+  min-height:0;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border-strong) transparent;
+}
+.chat::-webkit-scrollbar{ width:10px; }
+.chat::-webkit-scrollbar-thumb{
+  background:var(--border-strong);
+  border-radius:5px;
+  border:3px solid var(--surface);
+}
+
+.thread{ max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:22px; }
+
+.msg{ display:flex; flex-direction:column; animation:fade .3s ease; }
+@keyframes fade{
+  from{ opacity:0; transform:translateY(6px); }
+  to{ opacity:1; transform:none; }
+}
+
+/* 用户消息 */
+.msg.user{ align-items:flex-end; }
+.msg.user .bubble{
+  background:var(--primary-soft);
+  border:1px solid var(--primary-line);
+  border-radius:var(--r-md);
+  border-top-right-radius:4px;
+  padding:11px 15px;
+  max-width:78%;
+  font-size:var(--fs-body);
+  color:var(--text-1);
+}
+
+/* 助手消息：卡片式，因为是"结构化医学回答"而不是闲聊 */
+.msg.bot .card{
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  background:var(--surface);
+  overflow:hidden;
+  box-shadow:0 1px 2px rgba(15,35,56,.04);
+}
+.msg.bot .head{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:12px 16px;
+  background:var(--surface-2);
+  border-bottom:1px solid var(--border);
+}
+.ai-dot{
+  width:26px; height:26px;
+  border-radius:8px;
+  background:var(--primary);
+  color:#fff;
+  display:grid; place-items:center;
+  font-size:10px; font-weight:700;
+  letter-spacing:.02em;
+  flex:none;
+}
+.head .who{ font-size:13.5px; font-weight:600; }
+.head .div{ color:var(--border-strong); }
+.head .model{ font-size:12px; color:var(--text-3); }
+.head .time{ margin-left:auto; font-size:11.5px; color:var(--text-3); }
+
+.content{
+  padding:16px;
+  font-size:var(--fs-body);
+  line-height:var(--lh-body);
+  color:var(--text-1);
+}
+.content > * + *{ margin-top:13px; }
+.content b, .content strong{ font-weight:600; }
+
+.content ol{ list-style:none; counter-reset:s; display:flex; flex-direction:column; gap:9px; }
+.content ol li{
+  counter-increment:s;
+  padding-left:26px;
+  position:relative;
+}
+.content ol li::before{
+  content:counter(s);
+  position:absolute;
+  left:0; top:4px;
+  width:17px; height:17px;
+  border-radius:50%;
+  background:var(--primary-soft);
+  border:1px solid var(--primary-line);
+  color:var(--primary-ink);
+  font-size:10.5px;
+  font-weight:600;
+  display:grid; place-items:center;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.content ul{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+.content ul li{
+  padding-left:18px;
+  position:relative;
+}
+.content ul li::before{
+  content:"";
+  position:absolute;
+  left:3px; top:9px;
+  width:5px; height:5px;
+  border-radius:1.5px;
+  background:var(--text-3);
+}
+
+/* 提示框：医疗界面的核心内容单元（替代代码块的位置） */
+.callout{
+  display:flex;
+  gap:10px;
+  padding:12px 14px;
+  border-radius:var(--r-md);
+  border:1px solid;
+  font-size:14px;
+  line-height:1.7;
+}
+.callout .cl-ico{ flex:none; margin-top:2px; }
+.callout .cl-body b{ display:block; margin-bottom:3px; font-weight:600; }
+.callout.warn{
+  background:var(--warn-soft);
+  border-color:var(--warn-line);
+  color:#7a5205;
+}
+.callout.warn .cl-ico{ color:var(--warn); }
+.callout.info{
+  background:var(--primary-soft);
+  border-color:var(--primary-line);
+  color:var(--primary-ink);
+}
+.callout.info .cl-ico{ color:var(--primary); }
+.callout.danger{
+  background:var(--danger-soft);
+  border-color:var(--danger-line);
+  color:#8f2626;
+}
+.callout.danger .cl-ico{ color:var(--danger); }
+
+/* 来源行：AI 医学回答必须可溯源 */
+.sources{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  padding:10px 16px;
+  border-top:1px solid var(--border);
+  background:var(--surface-2);
+  font-size:11.5px;
+  line-height:1.6;
+  color:var(--text-3);
+}
+.sources svg{ flex:none; margin-top:2px; opacity:.7; }
+.sources b{ color:var(--text-2); font-weight:500; }
+
+/* 风险等级标签：不是装饰，是分级信息 */
+.foot-tags{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:11px 16px;
+  border-top:1px solid var(--border);
+  flex-wrap:wrap;
+}
+.risk{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  height:26px;
+  padding:0 11px;
+  border-radius:var(--pill);
+  font-size:12px;
+  font-weight:500;
+  border:1px solid;
+}
+.risk i{ width:6px; height:6px; border-radius:50%; }
+.risk.lv1{ background:var(--ok-soft); border-color:var(--ok-line); color:#07704e; }
+.risk.lv1 i{ background:var(--ok); }
+.risk.lv2{ background:var(--warn-soft); border-color:var(--warn-line); color:#7a5205; }
+.risk.lv2 i{ background:var(--warn); }
+.risk.lv3{ background:var(--danger-soft); border-color:var(--danger-line); color:#8f2626; }
+.risk.lv3 i{ background:var(--danger); }
+
+.foot-tags .scale{
+  margin-left:auto;
+  font-size:11px;
+  color:var(--text-3);
+}
+
+/* 建议 chips */
+.suggest{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.suggest button{
+  font-family:inherit;
+  font-size:13px;
+  color:var(--primary-ink);
+  background:var(--surface);
+  border:1px solid var(--primary-line);
+  border-radius:var(--pill);
+  padding:7px 14px;
+  cursor:pointer;
+  transition:background .14s, border-color .14s;
+}
+.suggest button:hover{ background:var(--primary-soft); border-color:var(--primary); }
+
+/* 打字 */
+.typing{ display:flex; gap:5px; padding:4px 0; }
+.typing i{
+  width:6px; height:6px; border-radius:50%;
+  background:var(--primary);
+  opacity:.45;
+  animation:bnc 1.15s infinite;
+}
+.typing i:nth-child(2){ animation-delay:.16s; }
+.typing i:nth-child(3){ animation-delay:.32s; }
+@keyframes bnc{
+  0%,60%,100%{ opacity:.3; transform:translateY(0); }
+  30%{ opacity:.9; transform:translateY(-4px); }
+}
+
+/* ===================== 输入区 ===================== */
+.composer-wrap{ flex:none; padding:12px 24px 16px; }
+
+.composer{
+  max-width:720px;
+  margin:0 auto;
+  border:1px solid var(--border-strong);
+  border-radius:var(--r-md);
+  background:var(--surface);
+  padding:11px 12px 9px;
+  transition:border-color .18s, box-shadow .18s;
+}
+.composer:focus-within{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(22,104,227,.14);
+}
+.composer textarea{
+  width:100%;
+  background:transparent;
+  border:none;
+  outline:none;
+  resize:none;
+  font-family:inherit;
+  font-size:var(--fs-body);
+  line-height:1.65;
+  color:var(--text-1);
+  min-height:24px;
+  max-height:170px;
+}
+.composer textarea::placeholder{ color:var(--text-3); }
+
+.c-bar{ display:flex; align-items:center; gap:4px; margin-top:8px; }
+.c-btn{
+  width:30px; height:30px;
+  display:grid; place-items:center;
+  border:none;
+  background:transparent;
+  border-radius:var(--r-sm);
+  color:var(--text-3);
+  cursor:pointer;
+  transition:background .14s, color .14s;
+}
+.c-btn:hover{ background:var(--surface-2); color:var(--primary-ink); }
+.c-hint{ margin-left:8px; font-size:11.5px; color:var(--text-3); }
+
+.send{
+  margin-left:auto;
+  height:32px;
+  padding:0 16px;
+  border:none;
+  border-radius:var(--r-sm);
+  background:var(--primary);
+  color:#fff;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:500;
+  display:flex; align-items:center; gap:6px;
+  cursor:pointer;
+  transition:background .14s;
+}
+.send:hover{ background:var(--primary-ink); }
+.send:disabled{
+  background:var(--surface-2);
+  color:var(--text-3);
+  border:1px solid var(--border);
+  cursor:default;
+}
+
+/* 底部二次免责：常驻，不可关闭 */
+.foot-note{
+  max-width:720px;
+  margin:9px auto 0;
+  display:flex;
+  align-items:flex-start;
+  gap:7px;
+  font-size:11.5px;
+  line-height:1.55;
+  color:var(--text-3);
+}
+.foot-note svg{ flex:none; margin-top:1px; opacity:.75; }
+.foot-note b{ color:var(--text-2); font-weight:500; }
+
+/* ===================== 响应式 ===================== */
+@media (max-width: 960px){
+  .body{ grid-template-columns:1fr; }
+  .rail{ display:none; }
+}
+@media (max-width: 640px){
+  .wrap{ padding:0; }
+  .app{ border-radius:0; border:none; }
+  .disclaimer{ font-size:11.5px; padding:8px 12px; }
+  .disclaimer .more{ display:none; }
+  .chat{ padding:16px 13px 4px; }
+  .composer-wrap{ padding:10px 13px 14px; }
+  .c-hint{ display:none; }
+  .msg.user .bubble{ max-width:88%; }
+  .topbar{ padding:0 14px; height:56px; }
+  .tb-sub{ display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="app">
+
+    <!-- ============ 免责声明条（常驻） ============ -->
+    <div class="disclaimer">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>
+      </svg>
+      <span><b>健康信息参考</b> · 本助手不提供诊断、处方或急救建议，不能替代执业医师面诊。</span>
+      <a class="more">查看说明</a>
+    </div>
+
+    <div class="body">
+
+      <!-- ============ 左栏 ============ -->
+      <aside class="rail">
+        <div class="patient">
+          <div class="p-avatar">李</div>
+          <div>
+            <div class="p-name">李建国</div>
+            <div class="p-meta">58 岁 · 男 · 档案 #A2093</div>
+          </div>
+        </div>
+
+        <div class="sec-label">
+          基础指标
+          <span class="sync">更新于 09:12</span>
+        </div>
+
+        <div class="vitals">
+          <div class="vital warn">
+            <div class="k"><i></i>血压</div>
+            <div class="v"><span class="n">145/95</span><span class="u">mmHg</span></div>
+          </div>
+          <div class="vital">
+            <div class="k"><i></i>心率</div>
+            <div class="v"><span class="n">72</span><span class="u">次/分</span></div>
+          </div>
+          <div class="vital">
+            <div class="k"><i></i>体温</div>
+            <div class="v"><span class="n">36.6</span><span class="u">°C</span></div>
+          </div>
+          <div class="vital">
+            <div class="k"><i></i>BMI</div>
+            <div class="v"><span class="n">22.4</span><span class="u">kg/m²</span></div>
+          </div>
+        </div>
+
+        <div class="sec-label">既往史与过敏</div>
+        <div class="history">
+          <div><b>高血压</b> · 2021 年确诊，目前未规律服药</div>
+          <div><b>过敏</b> · 青霉素</div>
+        </div>
+
+        <div class="sec-label">快捷</div>
+        <div class="quick">
+          <div class="q-item">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/>
+            </svg>
+            <span>问诊记录</span>
+            <span class="cnt">8</span>
+          </div>
+          <div class="q-item">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="3" width="16" height="18" rx="3"/><path d="M12 8v5M12 16h.01"/>
+            </svg>
+            <span>用药提醒</span>
+            <span class="cnt">2</span>
+          </div>
+          <div class="q-item">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 17l5-6 4 3 4-6 5 4"/><path d="M3 21h18"/>
+            </svg>
+            <span>检查报告</span>
+            <span class="cnt">3</span>
+          </div>
+        </div>
+
+        <div class="rail-foot">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+          </svg>
+          健康数据仅存储于本机
+        </div>
+      </aside>
+
+      <!-- ============ 右栏 ============ -->
+      <main class="main">
+
+        <header class="topbar">
+          <div class="tb-left">
+            <div class="tb-title">
+              健康助手
+              <span class="badge-ai">AI</span>
+            </div>
+            <div class="tb-sub">基于循证医学知识库 · 回答附来源</div>
+          </div>
+          <div class="tb-right">
+            <button class="btn-ghost">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+              新建咨询
+            </button>
+            <button class="btn-ghost" style="padding:0 10px">导出</button>
+          </div>
+        </header>
+
+        <div class="chat" id="chat">
+          <div class="thread" id="thread">
+
+            <!-- 用户提问 -->
+            <div class="msg user">
+              <div class="bubble">最近两周总是失眠，躺下一两个小时才睡着，白天很累。有什么办法吗？</div>
+            </div>
+
+            <!-- 助手回答：卡片式结构化 -->
+            <div class="msg bot">
+              <div class="card">
+                <div class="head">
+                  <div class="ai-dot">AI</div>
+                  <span class="who">健康助手</span>
+                  <span class="div">·</span>
+                  <span class="model">Med-PaLM 医疗版</span>
+                  <span class="time">刚刚</span>
+                </div>
+                <div class="content">
+                  <p>两周以上的入睡困难，通常归为<b>短期失眠</b>。在没有其他明显症状的情况下，多数可以先从作息与行为入手调整。以下方法证据支持较充分：</p>
+                  <ol>
+                    <li><b>固定起床时间</b>，比固定睡觉时间更有效——生物钟锚定在起床点上。</li>
+                    <li><b>躺下约 20 分钟仍无睡意就起身</b>，做低刺激的事，有困意再回床，避免把床和清醒绑定。</li>
+                    <li><b>睡前一小时避免强光与屏幕</b>，尤其避免在床上刷手机。</li>
+                    <li><b>下午两点后避免咖啡因</b>，包括茶和部分功能饮料。</li>
+                  </ol>
+                  <div class="callout warn">
+                    <svg class="cl-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/>
+                    </svg>
+                    <div class="cl-body">
+                      <b>出现以下情况建议尽快就诊</b>
+                      持续超过 3 周未见改善；白天出现明显注意力下降或情绪低落；伴随打鼾憋醒、腿部不适感或夜间频繁觉醒。可挂睡眠门诊或神经内科。
+                    </div>
+                  </div>
+                </div>
+                <div class="sources">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 3h9l4 4v14H6z"/><path d="M9 13h6M9 17h4"/>
+                  </svg>
+                  <span><b>依据</b>：AASM 失眠症行为治疗临床实践指南（2021）· 中国成人失眠诊断与治疗指南（2017 修订）</span>
+                </div>
+                <div class="foot-tags">
+                  <span class="risk lv1"><i></i>可先调整作息</span>
+                  <span class="scale">分级依据：症状持续时间与危险信号</span>
+                </div>
+              </div>
+              <div class="suggest">
+                <button data-key="bp">血压 145/95 需要吃降压药吗</button>
+                <button data-key="flu">怎么预防换季流感</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="composer-wrap">
+          <div class="composer">
+            <textarea id="ta" rows="1" placeholder="描述症状或提问，越具体越有帮助…"></textarea>
+            <div class="c-bar">
+              <button class="c-btn" title="上传报告">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 11l-9 9a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/>
+                </svg>
+              </button>
+              <button class="c-btn" title="选择部位">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="5" r="2.4"/><path d="M12 8v7M12 15l-3 6M12 15l3 6M7 11h10"/>
+                </svg>
+              </button>
+              <span class="c-hint">Enter 发送 · Shift+Enter 换行</span>
+              <button class="send" id="send" disabled>
+                发送
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h13M12 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="foot-note">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3l8 3v6c0 5-3.4 8.2-8 9-4.6-.8-8-4-8-9V6z"/>
+            </svg>
+            <span><b>紧急情况请直接拨打 120</b>。本页内容为演示用示例，回复由本地模拟生成，未连接真实模型。</span>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+</div>
+
+<script>
+/* 每条回复固定携带：正文 + 可能的提示框 + 来源 + 风险等级 */
+const REPLIES = {
+  bp: {
+    content: `<p>单次测到 145/95 mmHg 落在<b>1 级高血压</b>的区间内，但一次读数不足以作出判断，也<b>不建议自行开始服药</b>。</p>
+<ul>
+  <li>应在不同日、安静休息 5 分钟后重复测量至少 3 次，取平均值。</li>
+  <li>家庭自测的参考界值一般低于诊室，多以 135/85 mmHg 为界。</li>
+  <li>测量前 30 分钟避免吸烟、咖啡因与剧烈活动。</li>
+</ul>
+<div class="callout info">
+  <svg class="cl-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+  <div class="cl-body"><b>关于用药</b>是否启动药物治疗，需要医生结合年龄、合并症、靶器官损害与整体心血管风险来定，不能只凭血压数值决定。</div>
+</div>
+<div class="callout danger">
+  <svg class="cl-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 17h.01"/></svg>
+  <div class="cl-body"><b>立即就医的情况</b>剧烈头痛、视物模糊、胸痛胸闷、呼吸困难、一侧肢体无力或言语不清——请立即拨打 120。</div>
+</div>`,
+    sources: '中国高血压防治指南（2024 修订版）· WHO 高血压管理指南',
+    level: 2,
+    tag: '建议就医评估'
+  },
+  flu: {
+    content: `<p>换季流感的预防以<b>疫苗</b>和<b>手卫生</b>为主，这两项的有效性与成本效益最明确。</p>
+<ul>
+  <li>每年接种流感疫苗，60 岁以上与慢性病患者优先。</li>
+  <li>勤洗手，咳嗽或打喷嚏时用肘部遮挡。</li>
+  <li>流行季减少前往密闭拥挤场所，必要时佩戴口罩。</li>
+  <li>保证睡眠与蛋白质摄入，维持基础免疫状态。</li>
+</ul>
+<div class="callout info">
+  <svg class="cl-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+  <div class="cl-body"><b>关于维生素 C</b>目前证据不支持常规大剂量补充维生素 C 来预防流感，均衡饮食即可。</div>
+</div>`,
+    sources: 'WHO Influenza 立场文件 · 中国流感疫苗预防接种技术指南',
+    level: 1,
+    tag: '日常预防'
+  }
+};
+
+const QUESTIONS = {
+  bp: '血压 145/95 需要吃降压药吗',
+  flu: '怎么预防换季流感'
+};
+
+const chat = document.getElementById('chat');
+const thread = document.getElementById('thread');
+const ta = document.getElementById('ta');
+const sendBtn = document.getElementById('send');
+let busy = false;
+
+function toBottom(){
+  requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
+}
+
+function stamp(){
+  const d = new Date();
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+
+function addUser(text){
+  const el = document.createElement('div');
+  el.className = 'msg user';
+  el.innerHTML = '<div class="bubble"></div>';
+  el.querySelector('.bubble').textContent = text;
+  thread.appendChild(el);
+}
+
+function cardHTML(r){
+  const cls = r.level === 3 ? 'lv3' : (r.level === 2 ? 'lv2' : 'lv1');
+  return '<div class="card">' +
+    '<div class="head">' +
+      '<div class="ai-dot">AI</div>' +
+      '<span class="who">健康助手</span>' +
+      '<span class="div">·</span>' +
+      '<span class="model">Med-PaLM 医疗版</span>' +
+      '<span class="time">' + stamp() + '</span>' +
+    '</div>' +
+    '<div class="content">' + r.content + '</div>' +
+    '<div class="sources">' +
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M6 3h9l4 4v14H6z"/><path d="M9 13h6M9 17h4"/></svg>' +
+      '<span><b>依据</b>：' + r.sources + '</span>' +
+    '</div>' +
+    '<div class="foot-tags">' +
+      '<span class="risk ' + cls + '"><i></i>' + r.tag + '</span>' +
+      '<span class="scale">分级依据：症状持续时间与危险信号</span>' +
+    '</div>' +
+  '</div>';
+}
+
+function addBot(r){
+  const el = document.createElement('div');
+  el.className = 'msg bot';
+  el.innerHTML = cardHTML(r);
+  thread.appendChild(el);
+}
+
+function addTyping(){
+  const el = document.createElement('div');
+  el.className = 'msg bot';
+  el.innerHTML = '<div class="card"><div class="head">' +
+      '<div class="ai-dot">AI</div><span class="who">健康助手</span>' +
+      '<span class="div">·</span><span class="model">正在组织回答</span></div>' +
+    '<div class="content"><div class="typing"><i></i><i></i><i></i></div></div></div>';
+  thread.appendChild(el);
+  return el;
+}
+
+function clearSuggest(){ document.querySelectorAll('.suggest').forEach(n => n.remove()); }
+
+function ask(key){
+  if (busy) return;
+  busy = true;
+  clearSuggest();
+  addUser(QUESTIONS[key]);
+  toBottom();
+  const t = addTyping();
+  toBottom();
+  setTimeout(() => {
+    t.remove();
+    addBot(REPLIES[key]);
+    toBottom();
+    busy = false;
+  }, 950 + Math.random() * 450);
+}
+
+document.querySelectorAll('[data-key]').forEach(b => b.addEventListener('click', () => ask(b.dataset.key)));
+
+function sync(){ sendBtn.disabled = ta.value.trim() === ''; }
+
+ta.addEventListener('input', () => {
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 170) + 'px';
+  sync();
+});
+
+ta.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); submit(); }
+});
+
+function submit(){
+  const text = ta.value.trim();
+  if (!text || busy) return;
+  busy = true;
+  ta.value = ''; ta.style.height = 'auto'; sync();
+  clearSuggest();
+  addUser(text);
+  toBottom();
+  const t = addTyping();
+  toBottom();
+  setTimeout(() => {
+    t.remove();
+    addBot({
+      content: '<p>这是本地模拟的回复。真实场景下，医疗类问答至少需要三件事同时做到：</p>' +
+        '<ol><li><b>给出依据并标注来源</b>，让用户能自己核对；</li>' +
+        '<li><b>明确能力边界</b>，说清哪些情况必须由医生判断；</li>' +
+        '<li><b>标出危险信号</b>，把可能需要急救的情形前置。</li></ol>' +
+        '<div class="callout info">' +
+        '<svg class="cl-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>' +
+        '<div class="cl-body"><b>这一版可提取的视觉变量</b>风险三级语义色、来源行的字号与对比、提示框的三种状态（信息 / 注意 / 警示）、常驻免责条的位置与语气、以及指标卡「数字优先」的排版规则。</div></div>',
+      sources: '示例内容 · 不构成医学建议',
+      level: 2,
+      tag: '需结合具体情况'
+    });
+    toBottom();
+    busy = false;
+  }, 950 + Math.random() * 450);
+}
+
+sendBtn.addEventListener('click', submit);
+toBottom();
+</script>
+</body>
+</html>
