@@ -1,0 +1,10 @@
+stateDiagram-v2
+ [*] --> available
+ available --> held: 原子占位成功
+ available --> available: 抢号失败 提供替代
+ held --> confirmed: 患者确认
+ held --> cancelled: 患者取消
+ held --> expired: 一百八十秒到期
+ confirmed --> cancelled: 患者取消
+ cancelled --> available: 释放号源
+ expired --> available: 释放号源

@@ -1,0 +1,5 @@
+患者之前的信息和本轮描述：
+{{#precheck.context#}}
+已追问轮数：{{#precheck.rounds#}}
+参考资料：
+{{#format_knowledge.output#}}

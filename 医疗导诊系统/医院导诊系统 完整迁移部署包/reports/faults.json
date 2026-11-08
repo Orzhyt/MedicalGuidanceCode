@@ -1,0 +1,96 @@
+[
+  {
+    "case": "F01 HTTP不可达时写结果未知",
+    "status": "partial-succeeded",
+    "result": {
+      "ok": false,
+      "code": "TRANSPORT_UNKNOWN",
+      "message": "正在核实办理结果，请勿重复提交。",
+      "schema_version": "2.0",
+      "action": "hold",
+      "request_id": "fault-test",
+      "outcome_unknown": true,
+      "next_action": "status"
+    },
+    "passed": true
+  },
+  {
+    "case": "F02 医生接口不可达不编造医生",
+    "status": "partial-succeeded",
+    "result": {
+      "booking_payload": null,
+      "department_confidence": "high",
+      "knowledge_ids": [
+        "K02",
+        "K03"
+      ],
+      "message": "",
+      "possible_causes": [
+        "功能性消化不良",
+        "胃炎",
+        "胃食管反流"
+      ],
+      "profile": {
+        "age": 35,
+        "associated": "无发热、呕血黑便、胸痛、呼吸困难和晕厥，能正常活动",
+        "duration": "两天",
+        "location": "上腹",
+        "main_symptom": "饭后上腹胀痛",
+        "pregnancy": "unknown",
+        "red_flags_status": "absent",
+        "severity": "轻微"
+      },
+      "questions": [],
+      "rationale": "饭后上腹不适、症状轻微且无消化道出血或急腹症危险信号，符合消化系统方向，建议消化内科门诊评估；不能直接确诊胃炎。",
+      "recommended_doctors": [],
+      "schema_version": "2.0",
+      "specialty_code": "digestive",
+      "stage": "fallback",
+      "summary": "35岁，饭后上腹胀痛两天，轻微，无发热、呕血黑便、胸痛、呼吸困难或晕厥，能正常活动。",
+      "urgency": "routine"
+    },
+    "passed": true
+  },
+  {
+    "case": "F03 知识不可用转人工导诊",
+    "status": "succeeded",
+    "result": {
+      "department_confidence": "high",
+      "knowledge_ids": [],
+      "message": "暂时没法根据这些信息判断该挂什么科，建议到医院导诊台咨询，或先挂全科门诊。",
+      "possible_causes": [
+        "功能性消化不良",
+        "胃炎",
+        "胃食管反流病"
+      ],
+      "profile": {
+        "age": 35,
+        "associated": "无发热、呕血黑便、胸痛、呼吸困难和晕厥",
+        "duration": "两天",
+        "location": "上腹",
+        "main_symptom": "饭后上腹胀痛",
+        "pregnancy": "unknown",
+        "red_flags_status": "absent",
+        "severity": "轻微"
+      },
+      "questions": [],
+      "rationale": "患者上腹胀痛与进食相关，无急诊危险表现，症状轻微且病程短，优先考虑消化系统疾病，建议消化内科就诊。",
+      "recommended_doctors": [],
+      "schema_version": "1.0",
+      "specialty_code": "digestive",
+      "stage": "fallback",
+      "summary": "35岁患者，饭后上腹胀痛两天，轻微，无发热、呕血黑便、胸痛、呼吸困难和晕厥，能正常活动。",
+      "urgency": "routine"
+    },
+    "passed": true
+  },
+  {
+    "case": "F04 记录不可达不交接预约",
+    "status": "partial-succeeded",
+    "result": {
+      "stage": "record_unavailable",
+      "booking_payload": null
+    },
+    "passed": true
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "dataset_id": "689b2de6-64be-47a4-8e95-c1d64bda390a",
+  "knowledge_segments": 11,
+  "consultation": "d1cb98ac-7182-44e7-8478-875ce8e3e33b",
+  "booking": "1424dd7b-8567-4391-b25d-2c1133c9f391",
+  "consultation_site_code": "e7NGe1yXbM7lWXbc",
+  "consultation_published_workflow": "14b414c0-a913-449e-ad0e-4bcd6254b65b",
+  "consultation_name": "医院导诊 咨询追问推荐",
+  "booking_site_code": "1macAdtSsFb5aLeq",
+  "booking_published_workflow": "af5af827-e2a9-4121-8591-39580e522c43",
+  "booking_name": "医院导诊 医生档期预约"
+}

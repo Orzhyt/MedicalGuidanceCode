@@ -1,0 +1,26 @@
+sequenceDiagram
+ participant P as 患者前台
+ participant B as 业务后端
+ participant C as 咨询Chatflow
+ participant M as 医院服务
+ participant W as 预约Workflow
+ P->>B: 描述或选择候选
+ B->>C: query conversation_id user
+ C->>M: 保存本轮完整记录和私有输入
+ C-->>B: answer
+ B-->>P: 简短回复
+ B->>M: 本轮latest并验证归属
+ M-->>B: booking_ready和booking_workflow_inputs
+ P->>B: 点击预约提交
+ B->>M: 按登录身份签发患者令牌
+ B->>W: 私有输入补patient_token
+ W->>M: action=hold 原子占位
+ M-->>W: HELD或SLOT_TAKEN
+ W-->>B: message code result_json
+ B-->>P: 保留倒计时或冲突与候选
+ P->>B: 确认
+ B->>W: confirm appointment_id 新request_id
+ W->>M: 校验占位归属及有效期
+ M-->>W: CONFIRMED或HOLD_EXPIRED
+ W-->>B: 真实办理结果
+ B-->>P: 成功或重新选择

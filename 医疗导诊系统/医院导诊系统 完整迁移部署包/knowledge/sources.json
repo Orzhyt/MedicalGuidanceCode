@@ -1,0 +1,80 @@
+{
+  "compiled_at": "2026-10-11",
+  "purpose": "医院导诊参考资料",
+  "sources": [
+    {
+      "id": "NHS-HEART",
+      "url": "https://www.nhs.uk/conditions/heart-attack/",
+      "use": "胸痛危险信号"
+    },
+    {
+      "id": "NHS-ABDOMEN",
+      "url": "https://www.nhs.uk/symptoms/stomach-ache/",
+      "use": "腹痛与出血危险信号"
+    },
+    {
+      "id": "NHS-HEAD",
+      "url": "https://www.nhs.uk/symptoms/headaches/",
+      "use": "头痛追问与神经危险信号"
+    },
+    {
+      "id": "NHS-BREATH",
+      "url": "https://www.nhs.uk/symptoms/shortness-of-breath/",
+      "use": "呼吸困难与儿童危险信号"
+    },
+    {
+      "id": "NHS-COUGH",
+      "url": "https://www.nhs.uk/symptoms/cough/",
+      "use": "咳嗽追问"
+    },
+    {
+      "id": "NHS-JOINT",
+      "url": "https://www.nhs.uk/symptoms/joint-pain/",
+      "use": "关节与损伤危险信号"
+    },
+    {
+      "id": "NHS-PREGNANCY",
+      "url": "https://www.nhs.uk/conditions/ectopic-pregnancy/symptoms/",
+      "use": "妊娠相关危险信号",
+      "limitation": "页面最后复核2022-08-23，正式应用需临床更新"
+    },
+    {
+      "id": "NHS-THROAT",
+      "url": "https://www.nhs.uk/symptoms/sore-throat/",
+      "use": "吞咽与呼吸危险信号"
+    },
+    {
+      "id": "LOCAL-RULES",
+      "use": "自编追问字段、科室映射、知识编号和接口契约"
+    },
+    {
+      "id": "UPSTREAM",
+      "url": "https://github.com/Orzhyt/MedicalGuidanceSystem",
+      "branch": "dev",
+      "use": "医院和医生基础设定，预约业务参考"
+    }
+  ],
+  "mainland_workflow_sources": [
+    {
+      "title": "北京114智能导诊",
+      "url": "https://www.beijing.gov.cn/fuwu/bmfw/sy/jrts/202509/t20250929_4213337.html",
+      "purpose": "症状到科室再到预约的业务衔接"
+    },
+    {
+      "title": "北京114预约挂号流程",
+      "url": "https://www.beijing.gov.cn/fuwu/bmfw/bmjy/202109/t20210918_2496958.html",
+      "purpose": "日期、医生、时段与就诊人的选择确认"
+    },
+    {
+      "title": "北京市耳鼻咽喉科研究所听力眩晕门诊",
+      "url": "https://www.bjent.org.cn/Html/Departments/Main/Detail_5.html",
+      "purpose": "耳鸣和听力问题的专科方向"
+    },
+    {
+      "title": "北京市中医药管理局突然听力下降就医科普",
+      "url": "https://zyj.beijing.gov.cn/sy/whkp/202604/t20260420_4596688.html",
+      "purpose": "突然听力下降须及时专科就诊"
+    }
+  ],
+  "design_boundary": "必要追问、科室把握阈值与先展示余号为本项目设计规则，不是全国统一临床规范。"
+}

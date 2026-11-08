@@ -1,0 +1,6 @@
+{
+  "passed": true,
+  "patient_answer": "建议挂消化内科。想挂普通号还是专家号？想哪天就诊，上午还是下午？",
+  "staff_answer_matches": true,
+  "booking_query_passed": true
+}

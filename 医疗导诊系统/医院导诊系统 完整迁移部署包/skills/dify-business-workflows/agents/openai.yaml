@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dify 业务工作流搭建与迭代"
+  short_description: "从真实业务角色和患者体验出发搭建工作流，按小步试用迭代并验证事务联动"
+  default_prompt: "使用 $dify-business-workflows 调整当前工作流，先解决本轮反馈并记录改动，待我试用认可后再测试和更新文档。"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "中文 Dify 操作指导"
+  short_description: "按零基础学员的实际操作顺序制作中文 Dify 图解实验手册并验收"
+  default_prompt: "用 $dify-cn-operation-guide 为这个 Dify 应用编写一份从空白应用开始的中文图解实验操作指导。"

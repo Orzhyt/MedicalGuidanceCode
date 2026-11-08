@@ -1,0 +1,791 @@
+app:
+  description: 轻量版多轮导诊：LLM 结合导诊知识库追问细化病情，调用医院接口推荐科室医生；每轮问答回传预留接口，不直接挂号。
+  icon: 🏥
+  icon_background: '#E8F3FF'
+  mode: advanced-chat
+  name: 医院导诊 多轮追问与推荐（轻量版）
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.24@9e12eef09973667f0eaf4f082af883167e1de88740b22e71e71488d020c3778a
+    version: null
+kind: app
+version: 0.4.0
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - description: MedicalGuidanceSystem 服务地址；Dify 容器访问宿主机用 host.docker.internal:9090，服务器部署用内网 IP。
+    id: eef00be1-abac-42a6-8af3-bd7b6aa3d6f2
+    name: API_BASE_URL
+    selector:
+    - env
+    - API_BASE_URL
+    value: http://host.docker.internal:9090
+    value_type: string
+  - description: 对话问答记录回传地址（预留接口 base URL）。
+    id: ac993fea-6452-44f5-8af9-9b8a7b2023c8
+    name: RECORD_URL
+    selector:
+    - env
+    - RECORD_URL
+    value: http://host.docker.internal:8000
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions: []
+      allowed_file_types: []
+      allowed_file_upload_methods: []
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods: []
+      number_limits: 3
+    opening_statement: 您好，哪里不舒服，或想了解什么科室？
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions:
+    - 我肚子不舒服，该挂什么科？
+    - 最近总头痛，看哪个科室？
+    - 给孩子咨询咳嗽发烧
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: start-source-knowledge
+      source: start
+      sourceHandle: source
+      target: knowledge
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: template-transform
+      id: knowledge-source-format_knowledge
+      source: knowledge
+      sourceHandle: source
+      target: format_knowledge
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: template-transform
+        targetType: llm
+      id: format_knowledge-source-triage
+      source: format_knowledge
+      sourceHandle: source
+      target: triage
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: triage-source-parse
+      source: triage
+      sourceHandle: source
+      target: parse
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: if-else
+      id: parse-source-route
+      source: parse
+      sourceHandle: source
+      target: route
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: template-transform
+      id: route-emergency-emergency_text
+      source: route
+      sourceHandle: emergency
+      target: emergency_text
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: template-transform
+      id: route-ask-ask_text
+      source: route
+      sourceHandle: ask
+      target: ask_text
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: route-false-hospitals
+      source: route
+      sourceHandle: 'false'
+      target: hospitals
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: template-transform
+        targetType: variable-aggregator
+      id: emergency_text-source-reply_merge
+      source: emergency_text
+      sourceHandle: source
+      target: reply_merge
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: template-transform
+        targetType: variable-aggregator
+      id: ask_text-source-reply_merge
+      source: ask_text
+      sourceHandle: source
+      target: reply_merge
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: hospitals-source-recommend_llm
+      source: hospitals
+      sourceHandle: source
+      target: recommend_llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: recommend_llm-source-reply_merge
+      source: recommend_llm
+      sourceHandle: source
+      target: reply_merge
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: variable-aggregator
+        targetType: code
+      id: reply_merge-source-record_body
+      source: reply_merge
+      sourceHandle: source
+      target: record_body
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: record_body-source-save_record
+      source: record_body
+      sourceHandle: source
+      target: save_record
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: save_record-source-answer_other
+      source: save_record
+      sourceHandle: source
+      target: answer_other
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: 读取患者这一轮说的话。
+        selected: false
+        title: 接收患者描述
+        type: start
+        variables: []
+      height: 120
+      id: start
+      position:
+        x: 0
+        y: 300
+      positionAbsolute:
+        x: 0
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 检索与症状有关的追问要点和急诊提醒，最多取5条。
+        selected: false
+        title: 查找导诊知识库资料
+        type: knowledge-retrieval
+        dataset_ids: []
+        default_value:
+        - key: result
+          type: array[object]
+          value: []
+        error_strategy: default-value
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: reranking_model
+          score_threshold: 0
+          top_k: 5
+        query_variable_selector:
+        - sys
+        - query
+        retrieval_mode: multiple
+      height: 120
+      id: knowledge
+      position:
+        x: 300
+        y: 300
+      positionAbsolute:
+        x: 300
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 把检索到的内容整理给模型；没有资料时明确说明。
+        selected: false
+        title: 整理参考资料
+        type: template-transform
+        template: '{% for source in sources %}{{ source.content }}
+
+
+          {% else %}（本轮没有检索到参考资料）{% endfor %}'
+        variables:
+        - value_selector:
+          - knowledge
+          - result
+          value_type: array[object]
+          variable: sources
+      height: 120
+      id: format_knowledge
+      position:
+        x: 600
+        y: 300
+      positionAbsolute:
+        x: 600
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 结合知识库与对话历史判断：追问 / 推荐 / 急诊。
+        selected: false
+        title: 导诊分诊与追问
+        type: llm
+        context:
+          enabled: false
+        default_value:
+        - key: text
+          type: string
+          value: '{}'
+        error_strategy: default-value
+        model:
+          completion_params:
+            max_tokens: 2000
+            temperature: 0.1
+            response_format: json_object
+            thinking: false
+          mode: chat
+          name: deepseek-flash
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: triage-system
+          role: system
+          text: '你是医院导诊护士。任务是帮患者找到合适的就诊科室，不需要判断具体疾病；不确诊、不开药、不执行预约。
+
+
+            按导诊知识库的规则工作：
+
+            - 主诉清晰、专科方向明确就推荐，不必填齐年龄、病程、轻重等字段；未知信息保持未知。
+
+            - 只有答案会改变科室或就诊紧急程度时才追问；每轮只问一个短问题（尽量不超过30字）；最多追问三轮，达到三轮必须给出推荐，不能因为病因未明改全科。
+
+            - 危险信号（胸痛伴冷汗/呼吸困难/晕厥、严重呼吸困难、突发剧烈头痛或腹痛、呕血黑便等）时 action=emergency，直接提示急诊。
+
+            - 患者说“重新咨询”“开始新咨询”等时，从本轮重新开始，不再沿用之前的症状与追问。
+
+            - 科室把握低、说不清部位时推荐全科门诊（general），由医生再分诊。
+
+            - 医生由医院接口提供，你不编造医生姓名。
+
+
+            只输出一个 JSON 对象，不要输出其他文字：
+
+            {"action":"ask|recommend|emergency","question":"追问的问题（ask 时必填，其余为空字符串）","specialty_code":"general|digestive|respiratory|neurology|orthopedic|gynecology|pediatrics|ent|dermatology|endocrine|cardiac|surgery","specialty_label":"中文科室名，如
+            消化内科/全科门诊","summary":"患者事实摘要"}'
+        - id: triage-user
+          role: user
+          text: '患者本轮说：{{#sys.query#}}
+
+
+            导诊知识库参考：
+
+            {{#format_knowledge.output#}}'
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 1000
+        vision:
+          enabled: false
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            user: ''
+            assistant: ''
+          window:
+            enabled: true
+            size: 10
+      height: 120
+      id: triage
+      position:
+        x: 900
+        y: 300
+      positionAbsolute:
+        x: 900
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 把模型输出的 JSON 拆成可路由的字段。
+        selected: false
+        title: 解析分诊结果
+        type: code
+        code: "import json\nimport re\n\n\ndef main(text: str) -> dict:\n    action = \"ask\"\n    question = \"暂时没听明白，能再说一下哪里不舒服吗？\"\
+          \n    specialty_code = \"general\"\n    specialty_label = \"全科门诊\"\n    summary = \"\"\n    try:\n        cleaned\
+          \ = re.sub(r\"<think>.*?</think>\", \"\", text or \"\", flags=re.S).strip()\n        if cleaned.startswith(\"```\"\
+          ):\n            cleaned = cleaned.split(\"\\n\", 1)[1].rsplit(\"```\", 1)[0]\n        data = json.loads(cleaned)\n\
+          \        if not isinstance(data, dict):\n            raise ValueError\n        action = data.get(\"action\", \"\
+          ask\")\n        if action not in {\"ask\", \"recommend\", \"emergency\"}:\n            action = \"ask\"\n      \
+          \  question = str(data.get(\"question\") or question).strip()[:80] or question\n        specialty_code = str(data.get(\"\
+          specialty_code\") or \"general\")\n        specialty_label = str(data.get(\"specialty_label\") or \"全科门诊\").strip()[:20]\
+          \ or \"全科门诊\"\n        summary = str(data.get(\"summary\") or \"\").strip()[:200]\n    except (ValueError, TypeError):\n\
+          \        pass\n    return {\"action\": action, \"question\": question, \"specialty_code\": specialty_code, \"specialty_label\"\
+          : specialty_label, \"summary\": summary}\n"
+        code_language: python3
+        outputs:
+          action:
+            children: null
+            type: string
+          question:
+            children: null
+            type: string
+          specialty_code:
+            children: null
+            type: string
+          specialty_label:
+            children: null
+            type: string
+          summary:
+            children: null
+            type: string
+        variables:
+        - value_selector:
+          - triage
+          - text
+          value_type: string
+          variable: text
+      height: 120
+      id: parse
+      position:
+        x: 1200
+        y: 300
+      positionAbsolute:
+        x: 1200
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 急诊 / 追问 / 医生推荐走不同分支。
+        selected: false
+        title: 按分诊结果分流
+        type: if-else
+        cases:
+        - case_id: emergency
+          conditions:
+          - comparison_operator: is
+            id: routeemergency
+            value: emergency
+            varType: string
+            variable_selector:
+            - parse
+            - action
+          id: emergency
+          logical_operator: and
+        - case_id: ask
+          conditions:
+          - comparison_operator: is
+            id: routeask
+            value: ask
+            varType: string
+            variable_selector:
+            - parse
+            - action
+          id: ask
+          logical_operator: and
+      height: 120
+      id: route
+      position:
+        x: 1500
+        y: 300
+      positionAbsolute:
+        x: 1500
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 固定急诊提示语。
+        selected: false
+        title: 急诊提示
+        type: template-transform
+        template: 请尽快去就近医院急诊，必要时拨打120，不要等待门诊预约。
+        variables: []
+      height: 120
+      id: emergency_text
+      position:
+        x: 1800
+        y: 0
+      positionAbsolute:
+        x: 1800
+        y: 0
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 把追问问题作为本轮回复。
+        selected: false
+        title: 追问问题
+        type: template-transform
+        template: '{{ question }}'
+        variables:
+        - value_selector:
+          - parse
+          - question
+          value_type: string
+          variable: question
+      height: 120
+      id: ask_text
+      position:
+        x: 1800
+        y: 200
+      positionAbsolute:
+        x: 1800
+        y: 200
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 调用 MedicalGuidanceSystem 获取医院-科室-医生树。
+        selected: false
+        title: 获取医院科室与医生名单
+        type: http-request
+        authorization:
+          type: no-auth
+        body:
+          data: []
+          type: none
+        default_value:
+        - key: body
+          type: string
+          value: '[]'
+        error_strategy: default-value
+        headers: ''
+        method: GET
+        params: ''
+        retry_config:
+          max_retries: 0
+          retry_enabled: false
+          retry_interval: 1000
+        timeout:
+          connect: 3
+          read: 15
+          write: 15
+        url: '{{#env.API_BASE_URL#}}/api/hospitals'
+      height: 120
+      id: hospitals
+      position:
+        x: 1800
+        y: 500
+      positionAbsolute:
+        x: 1800
+        y: 500
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 从医院接口名单中挑选匹配医生并生成推荐话术。
+        selected: false
+        title: 生成医生推荐
+        type: llm
+        context:
+          enabled: false
+        default_value:
+        - key: text
+          type: string
+          value: 暂未检索到对口医生，可到医院导诊台咨询。
+        error_strategy: default-value
+        model:
+          completion_params:
+            max_tokens: 1000
+            temperature: 0.3
+          mode: chat
+          name: deepseek-flash
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: recommend-system
+          role: system
+          text: '你是医院导诊助手，把科室推荐和医院接口返回的医生名单结合成一段给患者看的推荐话术。
+
+            规则：
+
+            - 只推荐名单里与推荐科室方向匹配的医生（看 department_name 或 specialty 字段），最多3位。
+
+            - 名单里没有匹配医生时，如实说“暂未检索到对口医生，可到医院导诊台咨询”，不得编造医生姓名、职称、医院。
+
+            - 话术要包含：科室名称、医院名称、医生姓名、职称或擅长方向。
+
+            - 最后一句固定为：“本服务不直接挂号，请通过医院公众号、挂号平台或窗口办理。”
+
+            - 不输出任何诊断结论，不承诺余号。'
+        - id: recommend-user
+          role: user
+          text: '推荐科室：{{#parse.specialty_label#}}（specialty_code={{#parse.specialty_code#}}）
+
+            患者摘要：{{#parse.summary#}}
+
+
+            医院医生名单（JSON）：
+
+            {{#hospitals.body#}}'
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 1000
+        vision:
+          enabled: false
+      height: 120
+      id: recommend_llm
+      position:
+        x: 2100
+        y: 500
+      positionAbsolute:
+        x: 2100
+        y: 500
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 三个分支的回复取一个非空的。
+        selected: false
+        title: 汇总本轮回复
+        type: variable-aggregator
+        advanced_settings:
+          group_enabled: false
+          groups: []
+        output_type: string
+        variables:
+        - - ask_text
+          - output
+        - - emergency_text
+          - output
+        - - recommend_llm
+          - text
+      height: 120
+      id: reply_merge
+      position:
+        x: 2400
+        y: 300
+      positionAbsolute:
+        x: 2400
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 把本轮患者输入与回复拼成回传报文。
+        selected: false
+        title: 准备回传内容
+        type: code
+        code: "import json\n\n\ndef main(query: str, reply: str, conversation_id: str, user_id: str, run_id: str) -> dict:\n\
+          \    text = \"患者：\" + query + \"\\n回复：\" + reply\n    record = {\"event_id\": run_id, \"conversation_id\": conversation_id,\
+          \ \"user_id\": user_id, \"text\": text}\n    return {\"body\": json.dumps(record, ensure_ascii=False)}\n"
+        code_language: python3
+        outputs:
+          body:
+            children: null
+            type: string
+        variables:
+        - value_selector:
+          - sys
+          - query
+          value_type: string
+          variable: query
+        - value_selector:
+          - reply_merge
+          - output
+          value_type: string
+          variable: reply
+        - value_selector:
+          - sys
+          - conversation_id
+          value_type: string
+          variable: conversation_id
+        - value_selector:
+          - sys
+          - user_id
+          value_type: string
+          variable: user_id
+        - value_selector:
+          - sys
+          - workflow_run_id
+          value_type: string
+          variable: run_id
+      height: 120
+      id: record_body
+      position:
+        x: 2700
+        y: 300
+      positionAbsolute:
+        x: 2700
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 把本轮患者输入与回复回传给预留的记录接口。
+        selected: false
+        title: 回传本轮问答记录
+        type: http-request
+        authorization:
+          type: no-auth
+        body:
+          data:
+          - id: save_recordbody
+            key: ''
+            type: text
+            value: '{{#record_body.body#}}'
+          type: json
+        default_value:
+        - key: body
+          type: string
+          value: '{"ok": false, "message": "记录服务暂不可用"}'
+        error_strategy: default-value
+        headers: Content-Type:application/json
+        method: POST
+        params: ''
+        retry_config:
+          max_retries: 0
+          retry_enabled: false
+          retry_interval: 1000
+        timeout:
+          connect: 3
+          read: 15
+          write: 15
+        url: '{{#env.RECORD_URL#}}/api/record'
+      height: 120
+      id: save_record
+      position:
+        x: 3000
+        y: 300
+      positionAbsolute:
+        x: 3000
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    - data:
+        desc: 只回复患者需要的信息。
+        selected: false
+        title: 回复患者
+        type: answer
+        answer: '{{#reply_merge.output#}}'
+        variables: []
+      height: 120
+      id: answer_other
+      position:
+        x: 3300
+        y: 300
+      positionAbsolute:
+        x: 3300
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 260
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.55
+rag_pipeline_variables: []

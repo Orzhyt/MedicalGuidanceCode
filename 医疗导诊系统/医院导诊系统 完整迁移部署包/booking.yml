@@ -1,0 +1,535 @@
+version: 0.4.0
+kind: app
+app:
+  name: 医院导诊 医生档期预约
+  mode: workflow
+  icon: 🏥
+  icon_background: '#E8F3FF'
+  description: 根据症状帮助患者选择科室，通过多轮对话选择医生、号别和时间；患者回复与后台记录分开保存。
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.24@9e12eef09973667f0eaf4f082af883167e1de88740b22e71e71488d020c3778a
+    version: null
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - id: 87872daf-1fa0-4bbe-a4eb-fe497d911cae
+    name: API_BASE_URL
+    value: http://medical-guidance:8095
+    value_type: string
+    description: 医院接口地址；Dify容器需要能访问这个地址。
+    selector:
+    - env
+    - API_BASE_URL
+  - id: c3071c7f-25cb-4ff8-a040-4ed5a6837e59
+    name: SERVICE_API_KEY
+    value: ''
+    value_type: secret
+    description: 医院接口密钥；请使用保密变量，不要发给前台浏览器。
+    selector:
+    - env
+    - SERVICE_API_KEY
+  features:
+    file_upload:
+      allowed_file_extensions: []
+      allowed_file_types: []
+      allowed_file_upload_methods: []
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods: []
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    nodes:
+    - id: start
+      type: custom
+      width: 260
+      height: 120
+      position:
+        x: 0
+        y: 300
+      positionAbsolute:
+        x: 0
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: start
+        title: 接收预约参数和患者凭证
+        desc: 由导诊记录直接取得预约参数；后端补充患者凭证，患者不需要填写这些技术字段。
+        selected: false
+        variables:
+        - variable: booking_payload
+          label: 预约参数（从导诊后台记录直接取得）
+          type: paragraph
+          required: true
+          max_length: 4096
+          options: []
+        - variable: patient_token
+          label: 患者凭证（由后端补充）
+          type: paragraph
+          required: false
+          max_length: 4096
+          options: []
+    - id: validate
+      type: custom
+      width: 260
+      height: 120
+      position:
+        x: 300
+        y: 300
+      positionAbsolute:
+        x: 300
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: code
+        title: 检查填写内容
+        desc: 检查操作类型和必填参数；重复提交同一次操作时，请保留原请求编号。
+        selected: false
+        code_language: python3
+        code: "import json\nimport re\n\n\ndef main(action: str = \"\", doctor_id:\
+          \ str = \"\", slot_id: str = \"\", appointment_id: str = \"\", request_id:\
+          \ str = \"\", patient_token: str = \"\", booking_payload: str = \"\") ->\
+          \ dict:\n    if booking_payload:\n        try:\n            handover = json.loads(booking_payload)\n\
+          \            allowed = {\"action\", \"doctor_id\", \"slot_id\", \"appointment_id\"\
+          , \"request_id\", \"patient_token\"}\n            if not isinstance(handover,\
+          \ dict) or set(handover) - allowed:\n                raise ValueError(\"\
+          预约参数格式不正确\")\n            manual = {\"action\": action, \"doctor_id\": doctor_id,\
+          \ \"slot_id\": slot_id, \"appointment_id\": appointment_id, \"request_id\"\
+          : request_id}\n            if any(value and str(handover.get(key, value))\
+          \ != value for key, value in manual.items()):\n                raise ValueError(\"\
+          预约参数和手工填写的内容不一致\")\n            action = str(handover.get(\"action\") or\
+          \ action or \"\")\n            doctor_id = str(handover.get(\"doctor_id\"\
+          ) or doctor_id or \"\")\n            slot_id = str(handover.get(\"slot_id\"\
+          ) or slot_id or \"\")\n            appointment_id = str(handover.get(\"\
+          appointment_id\") or appointment_id or \"\")\n            request_id = str(handover.get(\"\
+          request_id\") or request_id or \"\")\n            embedded_token = str(handover.get(\"\
+          patient_token\") or \"\")\n            if patient_token and embedded_token\
+          \ and patient_token != embedded_token:\n                raise ValueError(\"\
+          患者凭证不一致\")\n            patient_token = patient_token or embedded_token\n\
+          \        except (ValueError, TypeError):\n            return {\"valid\"\
+          : 0, \"body\": \"{}\", \"error_json\": json.dumps({\"ok\": False, \"code\"\
+          : \"INVALID_INPUT\", \"message\": \"预约参数格式不正确或与手工输入不一致。\"}, ensure_ascii=False),\
+          \ \"action\": \"\", \"request_id\": \"\"}\n    actions = {\"query\", \"\
+          hold\", \"confirm\", \"cancel\", \"status\", \"list\"}\n    error = \"\"\
+          \n    if action not in actions:\n        error = \"请选择查询档期、申请占位、确认预约、取消预约、查询状态或查看我的预约（对应query、hold、confirm、cancel、status、list）。\"\
+          \n    elif action != \"query\" and not patient_token:\n        error = \"\
+          请填写后端生成的患者凭证（patient_token）。\"\n    elif action in {\"hold\", \"confirm\"\
+          , \"cancel\"} and not re.fullmatch(r\"[A-Za-z0-9_-]{1,80}\", request_id\
+          \ or \"\"):\n        error = \"请填写本次操作的请求编号（request_id）。如果是重试，请使用上次的编号。\"\
+          \n    elif action == \"hold\" and not slot_id:\n        error = \"请填写要预约的时段编号（slot_id），可先查询医生档期获取。\"\
+          \n    elif action in {\"confirm\", \"cancel\"} and not appointment_id:\n\
+          \        error = \"请填写预约编号（appointment_id），可从占位结果中获取。\"\n    elif action\
+          \ == \"status\" and not appointment_id and not request_id:\n        error\
+          \ = \"请填写预约编号（appointment_id）或上次操作的请求编号（request_id）。\"\n    elif doctor_id\
+          \ and not re.fullmatch(r\"\\d{1,5}\", doctor_id):\n        error = \"医生编号（doctor_id）请只填数字，例如2。\"\
+          \n    payload = {\"action\": action, \"doctor_id\": int(doctor_id or 0)\
+          \ if not error else 0, \"slot_id\": slot_id or \"\", \"appointment_id\"\
+          : appointment_id or \"\", \"request_id\": request_id or \"\", \"patient_token\"\
+          : patient_token or \"\"}\n    return {\"valid\": 0 if error else 1, \"body\"\
+          : json.dumps(payload, ensure_ascii=False), \"error_json\": json.dumps({\"\
+          ok\": False, \"code\": \"INVALID_INPUT\", \"message\": error}, ensure_ascii=False),\
+          \ \"action\": action, \"request_id\": request_id}\n"
+        variables:
+        - variable: booking_payload
+          value_selector:
+          - start
+          - booking_payload
+          value_type: string
+        - variable: patient_token
+          value_selector:
+          - start
+          - patient_token
+          value_type: string
+        outputs:
+          valid:
+            type: number
+            children: null
+          body:
+            type: string
+            children: null
+          error_json:
+            type: string
+            children: null
+          action:
+            type: string
+            children: null
+          request_id:
+            type: string
+            children: null
+    - id: branch
+      type: custom
+      width: 260
+      height: 120
+      position:
+        x: 600
+        y: 300
+      positionAbsolute:
+        x: 600
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: if-else
+        title: 判断信息是否齐全
+        desc: 信息齐全时调用医院接口；缺少信息时说明需要补充什么。
+        selected: false
+        cases:
+        - id: '1'
+          case_id: '1'
+          logical_operator: and
+          conditions:
+          - id: branch1
+            variable_selector:
+            - validate
+            - valid
+            varType: number
+            comparison_operator: '='
+            value: '1'
+    - id: execute
+      type: custom
+      width: 260
+      height: 120
+      position:
+        x: 900
+        y: 100
+      positionAbsolute:
+        x: 900
+        y: 100
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: http-request
+        title: 办理查询或预约
+        desc: 医院接口负责查询、占位、确认、取消和状态查询，并防止重复预约或多人抢到同一个号。
+        selected: false
+        method: POST
+        url: '{{#env.API_BASE_URL#}}/api/booking/run'
+        authorization:
+          type: no-auth
+        headers: 'Content-Type:application/json
+
+          X-Service-Key:{{#env.SERVICE_API_KEY#}}'
+        params: ''
+        body:
+          type: json
+          data:
+          - id: executebody
+            key: ''
+            type: text
+            value: '{{#validate.body#}}'
+        timeout:
+          connect: 3
+          read: 15
+          write: 15
+        retry_config:
+          retry_enabled: false
+          max_retries: 0
+          retry_interval: 1000
+        error_strategy: default-value
+        default_value:
+        - key: body
+          type: string
+          value: '{"ok": false, "code": "TRANSPORT_UNKNOWN", "message": "暂时连接不上医院服务。如果刚才提交了预约或取消，请先用原请求编号查一下结果，再决定是否重试。"}'
+    - id: invalid
+      type: custom
+      width: 260
+      height: 120
+      position:
+        x: 900
+        y: 500
+      positionAbsolute:
+        x: 900
+        y: 500
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: template-transform
+        title: 说明填写问题
+        desc: 返回具体的参数错误，不执行预约。
+        selected: false
+        variables:
+        - variable: error
+          value_selector:
+          - validate
+          - error_json
+          value_type: string
+        template: '{{ error }}'
+    - id: merge
+      type: custom
+      width: 260
+      height: 120
+      position:
+        x: 1200
+        y: 300
+      positionAbsolute:
+        x: 1200
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: variable-aggregator
+        title: 汇总处理结果
+        desc: 接收医院接口的返回结果，或输入检查给出的错误说明。
+        selected: false
+        output_type: string
+        variables:
+        - - execute
+          - body
+        - - invalid
+          - output
+        advanced_settings:
+          group_enabled: false
+          groups: []
+    - id: render
+      type: custom
+      width: 260
+      height: 120
+      position:
+        x: 1500
+        y: 300
+      positionAbsolute:
+        x: 1500
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: code
+        title: 整理预约结果和可选时段
+        desc: 把预约状态、时间和其他可选时段写成中文；网络异常时提醒先核实结果。
+        selected: false
+        code_language: python3
+        code: "import json\nfrom datetime import datetime, timedelta, timezone\n\n\
+          STATUS_NAMES = {\"held\": \"等待确认\", \"confirmed\": \"预约成功\", \"cancelled\"\
+          : \"已取消\", \"expired\": \"保留已过期\"}\n\n\ndef readable_time(value: str) ->\
+          \ str:\n    try:\n        moment = datetime.fromisoformat(value).astimezone(timezone(timedelta(hours=8)))\n\
+          \        return f\"{moment.month}月{moment.day}日{moment:%H:%M}\"\n    except\
+          \ (ValueError, TypeError):\n        return \"时间待核实\"\n\n\ndef main(body:\
+          \ str, action: str, request_id: str) -> dict:\n    try:\n        result\
+          \ = json.loads(body)\n        if not isinstance(result, dict) or \"ok\"\
+          \ not in result or \"code\" not in result:\n            raise ValueError(\"\
+          结果格式不完整\")\n    except (ValueError, TypeError):\n        result = {\"ok\"\
+          : False, \"code\": \"RESULT_UNKNOWN\", \"message\": \"正在核实办理结果，请勿重复提交。\"\
+          }\n    result.update(schema_version=\"2.0\", action=action, request_id=request_id)\n\
+          \    if result[\"code\"] in [\"TRANSPORT_UNKNOWN\", \"RESULT_UNKNOWN\",\
+          \ \"RETRYABLE_DB_BUSY\"]:\n        result[\"outcome_unknown\"] = True\n\
+          \        result[\"next_action\"] = \"status\" if action in [\"hold\", \"\
+          confirm\", \"cancel\"] else \"retry\"\n        result[\"message\"] = \"\
+          正在核实办理结果，请勿重复提交。\"\n    messages = {\"HELD\": \"已为您保留号源，请在3分钟内确认。\", \"\
+          CONFIRMED\": \"预约成功。\", \"CANCELLED\": \"预约已取消。\", \"ALREADY_RELEASED\"\
+          : \"该预约已释放。\", \"HOLD_EXPIRED\": \"保留时间已过，预约尚未成功，请重新选择。\", \"SLOT_TAKEN\"\
+          : \"这个时段已约满，请选择其他时段。\", \"PATIENT_TIME_CONFLICT\": \"这个时间与您的其他预约冲突，请换个时间。\"\
+          , \"EXISTING_APPOINTMENT\": \"您已保留或预约这个时段，不需要重复提交。\"}\n    message = messages.get(result[\"\
+          code\"], str(result.get(\"message\", \"\")))\n    appointment = result.get(\"\
+          appointment\")\n    if appointment:\n        message += f\"\\n{readable_time(appointment['starts_at'])}，{appointment['doctor_name']}，{appointment['hospital_name']}。\"\
+          \n        if result[\"code\"] == \"APPOINTMENT_STATUS\":\n            message\
+          \ += \"\\n当前状态：\" + STATUS_NAMES.get(appointment[\"status\"], \"待核实\") +\
+          \ \"。\"\n        if appointment[\"status\"] == \"held\":\n            message\
+          \ += \"\\n请在\" + readable_time(appointment[\"expires_at\"]) + \"前确认。\"\n\
+          \    if result.get(\"alternatives\"):\n        message += \"\\n还可选择：\\n\"\
+          \ + \"\\n\".join(f\"{index}. {readable_time(slot['starts_at'])}，{slot['doctor_name']}\"\
+          \ for index, slot in enumerate(result[\"alternatives\"][:3], 1))\n    if\
+          \ result.get(\"code\") == \"SLOTS\":\n        message = \"已查到可预约时段，请选择医生和时间。\"\
+          \ if result.get(\"slots\") else \"暂时没有可预约时段，请换个日期或医生。\"\n    if result.get(\"\
+          code\") == \"APPOINTMENTS\":\n        message = \"您的预约：\\n\" + \"\\n\".join(f\"\
+          {readable_time(item['starts_at'])}，{item['doctor_name']}，{STATUS_NAMES.get(item['status'],\
+          \ '待核实')}\" for item in result.get(\"appointments\", [])[:5]) if result.get(\"\
+          appointments\") else \"您目前没有预约记录。\"\n    return {\"result_json\": json.dumps(result,\
+          \ ensure_ascii=False), \"message\": message, \"code\": str(result[\"code\"\
+          ]), \"ok\": 1 if result[\"ok\"] else 0}\n"
+        variables:
+        - variable: body
+          value_selector:
+          - merge
+          - output
+          value_type: string
+        - variable: action
+          value_selector:
+          - validate
+          - action
+          value_type: string
+        - variable: request_id
+          value_selector:
+          - validate
+          - request_id
+          value_type: string
+        outputs:
+          result_json:
+            type: string
+            children: null
+          message:
+            type: string
+            children: null
+          code:
+            type: string
+            children: null
+          ok:
+            type: number
+            children: null
+    - id: end
+      type: custom
+      width: 260
+      height: 120
+      position:
+        x: 1800
+        y: 300
+      positionAbsolute:
+        x: 1800
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: end
+        title: 返回办理结果
+        desc: 返回可读说明、结果数据和状态码，供前台展示和处理。
+        selected: false
+        outputs:
+        - variable: result_json
+          value_selector:
+          - render
+          - result_json
+          value_type: string
+        - variable: message
+          value_selector:
+          - render
+          - message
+          value_type: string
+        - variable: code
+          value_selector:
+          - render
+          - code
+          value_type: string
+        - variable: ok
+          value_selector:
+          - render
+          - ok
+          value_type: number
+    edges:
+    - id: start-source-validate
+      type: custom
+      source: start
+      target: validate
+      sourceHandle: source
+      targetHandle: target
+      data:
+        sourceType: start
+        targetType: code
+        isInIteration: false
+        isInLoop: false
+      zIndex: 0
+    - id: validate-source-branch
+      type: custom
+      source: validate
+      target: branch
+      sourceHandle: source
+      targetHandle: target
+      data:
+        sourceType: code
+        targetType: if-else
+        isInIteration: false
+        isInLoop: false
+      zIndex: 0
+    - id: execute-source-merge
+      type: custom
+      source: execute
+      target: merge
+      sourceHandle: source
+      targetHandle: target
+      data:
+        sourceType: http-request
+        targetType: variable-aggregator
+        isInIteration: false
+        isInLoop: false
+      zIndex: 0
+    - id: invalid-source-merge
+      type: custom
+      source: invalid
+      target: merge
+      sourceHandle: source
+      targetHandle: target
+      data:
+        sourceType: template-transform
+        targetType: variable-aggregator
+        isInIteration: false
+        isInLoop: false
+      zIndex: 0
+    - id: merge-source-render
+      type: custom
+      source: merge
+      target: render
+      sourceHandle: source
+      targetHandle: target
+      data:
+        sourceType: variable-aggregator
+        targetType: code
+        isInIteration: false
+        isInLoop: false
+      zIndex: 0
+    - id: render-source-end
+      type: custom
+      source: render
+      target: end
+      sourceHandle: source
+      targetHandle: target
+      data:
+        sourceType: code
+        targetType: end
+        isInIteration: false
+        isInLoop: false
+      zIndex: 0
+    - id: branch-1-execute
+      type: custom
+      source: branch
+      target: execute
+      sourceHandle: '1'
+      targetHandle: target
+      data:
+        sourceType: if-else
+        targetType: http-request
+        isInIteration: false
+        isInLoop: false
+      zIndex: 0
+    - id: branch-false-invalid
+      type: custom
+      source: branch
+      target: invalid
+      sourceHandle: 'false'
+      targetHandle: target
+      data:
+        sourceType: if-else
+        targetType: template-transform
+        isInIteration: false
+        isInLoop: false
+      zIndex: 0
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.55
+  rag_pipeline_variables: []

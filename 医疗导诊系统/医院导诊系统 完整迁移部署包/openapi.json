@@ -1,0 +1,385 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "医院导诊与预约接口",
+    "version": "2.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8095"
+    },
+    {
+      "url": "http://medical-guidance:8095"
+    }
+  ],
+  "security": [
+    {
+      "ServiceKey": []
+    }
+  ],
+  "paths": {
+    "/api/doctors": {
+      "get": {
+        "summary": "医院医生名单",
+        "responses": {
+          "200": {
+            "description": "医院医生名单"
+          }
+        }
+      }
+    },
+    "/api/hospitals": {
+      "get": {
+        "summary": "医院及医生列表",
+        "responses": {
+          "200": {
+            "description": "医院及医生列表"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "security": [],
+        "summary": "服务健康",
+        "responses": {
+          "200": {
+            "description": "服务可用"
+          }
+        }
+      }
+    },
+    "/api/doctors/{doctor_id}/slots": {
+      "get": {
+        "summary": "查询医生档期，不占号",
+        "parameters": [
+          {
+            "name": "doctor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功或业务拒绝，检查ok和code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/booking/run": {
+      "post": {
+        "summary": "显式预约操作",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功或业务拒绝，检查ok和code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "非法JSON"
+          },
+          "401": {
+            "description": "服务密钥无效"
+          },
+          "503": {
+            "description": "数据库暂忙，结果待核查"
+          }
+        }
+      }
+    },
+    "/api/patients/session": {
+      "post": {
+        "summary": "可信后端签发患者会话",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "patient_id"
+                ],
+                "properties": {
+                  "patient_id": {
+                    "type": "string",
+                    "pattern": "^PATIENT-[A-Za-z0-9_-]{1,40}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "有效3600秒的患者令牌"
+          },
+          "400": {
+            "description": "患者编号不合法"
+          },
+          "401": {
+            "description": "服务密钥无效"
+          }
+        }
+      }
+    },
+    "/api/booking/options": {
+      "get": {
+        "summary": "查询科室医生和实际可预约时段，不占号",
+        "parameters": [
+          {
+            "name": "specialty_code",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "general"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "医生、号别、余号及服务器时间"
+          }
+        }
+      }
+    },
+    "/api/consultations/{conversation_id}": {
+      "get": {
+        "summary": "完整咨询对话与后台记录",
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "完整咨询对话与后台记录"
+          },
+          "401": {
+            "description": "服务密钥无效"
+          }
+        }
+      }
+    },
+    "/api/consultations/{conversation_id}/latest": {
+      "get": {
+        "summary": "最近一轮咨询后台记录",
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "最近一轮咨询后台记录"
+          },
+          "401": {
+            "description": "服务密钥无效"
+          }
+        }
+      }
+    },
+    "/api/consultations/record": {
+      "post": {
+        "summary": "持久化一轮完整咨询记录，拒绝非空凭据",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsultationRecord"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "已保存或业务拒绝"
+          },
+          "401": {
+            "description": "服务密钥无效"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ServiceKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Service-Key"
+      }
+    },
+    "schemas": {
+      "BookingRequest": {
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "query",
+              "hold",
+              "confirm",
+              "cancel",
+              "status",
+              "list"
+            ]
+          },
+          "slot_id": {
+            "type": "string"
+          },
+          "appointment_id": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "patient_token": {
+            "type": "string"
+          },
+          "doctor_id": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "BookingResult": {
+        "type": "object",
+        "required": [
+          "ok",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "appointment": {
+            "type": "object"
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "alternatives": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "appointments": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "replayed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ConsultationRecord": {
+        "type": "object",
+        "required": [
+          "event_id",
+          "conversation_id",
+          "user_id",
+          "patient_query",
+          "patient_answer"
+        ],
+        "properties": {
+          "event_id": {
+            "type": "string"
+          },
+          "conversation_id": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "patient_query": {
+            "type": "string"
+          },
+          "patient_answer": {
+            "type": "string"
+          },
+          "result": {
+            "type": "object"
+          },
+          "state": {
+            "type": "object"
+          },
+          "model_output": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          },
+          "knowledge": {
+            "type": "string"
+          },
+          "availability": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

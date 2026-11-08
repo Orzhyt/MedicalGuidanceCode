@@ -1,0 +1,405 @@
+[
+  {
+    "case": "S01 妇产方向",
+    "query": "女，28岁，月经期间轻微下腹疼一天，偶尔会有，不影响活动，没有怀孕、异常出血、发热、晕厥、呼吸困难或突然剧烈疼痛",
+    "expected_doctor_id": 4,
+    "result": {
+      "booking_payload": null,
+      "department_confidence": "high",
+      "department_recommendation": "妇产科",
+      "knowledge_ids": [
+        "K07"
+      ],
+      "message": "",
+      "possible_causes": [],
+      "preferences": {},
+      "profile": {
+        "age": 28,
+        "associated": "偶尔会有；无怀孕、异常出血、发热、晕厥、呼吸困难或突然剧烈疼痛",
+        "duration": "一天",
+        "location": "下腹",
+        "main_symptom": "月经期间轻微下腹痛",
+        "pregnancy": "无怀孕",
+        "red_flags_status": "absent",
+        "severity": "轻微"
+      },
+      "questions": [
+        "想哪天就诊？"
+      ],
+      "rationale": "月经期下腹痛，无危险信号，属妇产科方向；患者已提供年龄、持续时间、部位、程度及关键伴随情况，信息足够，无需继续追问。",
+      "recommended_doctors": [
+        {
+          "department": "妇产科",
+          "doctor_id": 4,
+          "doctor_name": "赵丽华",
+          "hospital_id": 1,
+          "hospital_name": "云岭省星海市第一人民医院",
+          "id": 4,
+          "name": "赵丽华",
+          "registration_type": "expert",
+          "specialty": "妇产科",
+          "specialty_code": "gynecology",
+          "title": "副主任医师"
+        }
+      ],
+      "schema_version": "2.0",
+      "specialty_code": "gynecology",
+      "stage": "recommend",
+      "summary": "28岁女性，月经期间轻微下腹痛一天，偶尔出现，不影响活动；否认怀孕、异常出血、发热、晕厥、呼吸困难及突然剧烈疼痛。",
+      "urgency": "routine"
+    }
+  },
+  {
+    "case": "S02 耳鼻喉方向",
+    "query": "32岁，喉咙轻微疼痛两天，没有发热、吞咽困难、流涎、气促或晕厥，能正常吃饭喝水，日常活动正常",
+    "expected_doctor_id": 11,
+    "result": {
+      "booking_payload": null,
+      "department_confidence": "high",
+      "department_recommendation": "耳鼻喉科",
+      "knowledge_ids": [
+        "K09"
+      ],
+      "message": "",
+      "possible_causes": [],
+      "preferences": {},
+      "profile": {
+        "age": 32,
+        "associated": "无发热、吞咽困难、流涎、气促、晕厥，能正常吃饭喝水，日常活动正常",
+        "duration": "两天",
+        "location": "咽喉",
+        "main_symptom": "喉咙轻微疼痛",
+        "pregnancy": "unknown",
+        "red_flags_status": "absent",
+        "severity": "轻微"
+      },
+      "questions": [
+        "想哪天就诊？"
+      ],
+      "rationale": "咽喉局部不适主诉明确，通常归属耳鼻喉科；无发热、吞咽困难、流涎、气促等危险表现，无需急诊或当天紧急处理，可常规就诊耳鼻喉科。",
+      "recommended_doctors": [
+        {
+          "department": "耳鼻喉科",
+          "doctor_id": 11,
+          "doctor_name": "林晓",
+          "hospital_id": 2,
+          "hospital_name": "云岭省星海市中心医院",
+          "id": 11,
+          "name": "林晓",
+          "registration_type": "ordinary",
+          "specialty": "耳鼻喉常见病",
+          "specialty_code": "ent",
+          "title": "主治医师"
+        }
+      ],
+      "schema_version": "2.0",
+      "specialty_code": "ent",
+      "stage": "recommend",
+      "summary": "32岁患者，喉咙轻微疼痛两天，无发热、吞咽困难、流涎、气促或晕厥，能正常进食饮水，日常活动正常。",
+      "urgency": "routine"
+    }
+  },
+  {
+    "case": "S03 皮肤方向",
+    "query": "30岁，左前臂局部瘙痒红疹三天，轻微，没有发热、黏膜破损、脸部肿胀、气促、晕厥或快速扩散，没有使用新药",
+    "expected_doctor_id": 12,
+    "result": {
+      "booking_payload": null,
+      "department_confidence": "high",
+      "department_recommendation": "皮肤科",
+      "knowledge_ids": [
+        "K10"
+      ],
+      "message": "",
+      "possible_causes": [],
+      "preferences": {},
+      "profile": {
+        "age": 30,
+        "associated": "没有发热、黏膜破损、脸部肿胀、气促、晕厥或快速扩散，没有使用新药",
+        "duration": "三天",
+        "location": "左前臂",
+        "main_symptom": "左前臂局部瘙痒红疹",
+        "pregnancy": "unknown",
+        "red_flags_status": "absent",
+        "severity": "轻微"
+      },
+      "questions": [
+        "想哪天就诊？"
+      ],
+      "rationale": "局部瘙痒红疹，部位明确、病程三天、程度轻微，无全身或危急表现，符合皮肤科就诊方向；信息已足够，无需继续追问。",
+      "recommended_doctors": [
+        {
+          "department": "皮肤科",
+          "doctor_id": 12,
+          "doctor_name": "许晴",
+          "hospital_id": 3,
+          "hospital_name": "云岭省星海市第二人民医院",
+          "id": 12,
+          "name": "许晴",
+          "registration_type": "ordinary",
+          "specialty": "皮疹与皮肤过敏",
+          "specialty_code": "dermatology",
+          "title": "主治医师"
+        }
+      ],
+      "schema_version": "2.0",
+      "specialty_code": "dermatology",
+      "stage": "recommend",
+      "summary": "30岁患者，左前臂局部瘙痒红疹三天，程度轻微，无发热、黏膜破损、脸部肿胀、气促、晕厥或快速扩散，无新用药史。",
+      "urgency": "routine"
+    }
+  },
+  {
+    "case": "S04 内分泌复诊",
+    "query": "45岁，已确诊糖尿病三年，近一周空腹血糖7.5mmol/L，想复诊评估，轻微口渴，正常活动，没有呕吐、严重乏力、意识异常、胸痛、呼吸困难或晕厥",
+    "expected_doctor_id": 5,
+    "result": {
+      "booking_payload": null,
+      "department_confidence": "high",
+      "department_recommendation": "内分泌科",
+      "knowledge_ids": [
+        "K10"
+      ],
+      "message": "",
+      "possible_causes": [],
+      "preferences": {},
+      "profile": {
+        "age": 45,
+        "associated": "轻微口渴，正常活动，无呕吐、严重乏力、意识异常、胸痛、呼吸困难或晕厥",
+        "duration": "已确诊糖尿病三年，近一周空腹血糖7.5mmol/L",
+        "location": "unknown",
+        "main_symptom": "糖尿病复诊评估，轻微口渴",
+        "pregnancy": "unknown",
+        "red_flags_status": "absent",
+        "severity": "轻微"
+      },
+      "questions": [
+        "想哪天就诊？"
+      ],
+      "rationale": "患者为已确诊糖尿病的复诊评估，伴轻微口渴，无急性危险表现，按已知血糖异常的咨询建议挂内分泌科。",
+      "recommended_doctors": [
+        {
+          "department": "内科",
+          "doctor_id": 5,
+          "doctor_name": "陈伟民",
+          "hospital_id": 2,
+          "hospital_name": "云岭省星海市中心医院",
+          "id": 5,
+          "name": "陈伟民",
+          "registration_type": "expert",
+          "specialty": "内分泌科",
+          "specialty_code": "endocrine",
+          "title": "主任医师"
+        }
+      ],
+      "schema_version": "2.0",
+      "specialty_code": "endocrine",
+      "stage": "recommend",
+      "summary": "45岁患者，已确诊糖尿病三年，近一周空腹血糖7.5mmol/L，想复诊评估，伴轻微口渴，正常活动，无呕吐、严重乏力、意识异常、胸痛、呼吸困难或晕厥。",
+      "urgency": "routine"
+    }
+  },
+  {
+    "case": "S05 方向明确不强制补齐字段",
+    "query": "我是35岁男性，饭后上腹胀痛两天，轻微，不影响活动，应该挂什么科？",
+    "result": {
+      "booking_payload": null,
+      "department_confidence": "high",
+      "department_recommendation": "消化内科",
+      "knowledge_ids": [
+        "K03",
+        "K01"
+      ],
+      "message": "",
+      "possible_causes": [],
+      "preferences": {},
+      "profile": {
+        "age": 35,
+        "associated": "不影响活动",
+        "duration": "两天",
+        "location": "上腹部",
+        "main_symptom": "饭后上腹胀痛",
+        "pregnancy": "unknown",
+        "red_flags_status": "unknown",
+        "severity": "轻微"
+      },
+      "questions": [
+        "想哪天就诊？"
+      ],
+      "rationale": "饭后上腹不适、胀痛，消化系统方向明确，症状轻微无紧急表现，建议消化内科就诊；未提及发热、呕吐、呕血或黑便等，未声称已排除急症。",
+      "recommended_doctors": [
+        {
+          "department": "内科",
+          "doctor_id": 2,
+          "doctor_name": "李慧敏",
+          "hospital_id": 1,
+          "hospital_name": "云岭省星海市第一人民医院",
+          "id": 2,
+          "name": "李慧敏",
+          "registration_type": "ordinary",
+          "specialty": "消化内科",
+          "specialty_code": "digestive",
+          "title": "主治医师"
+        },
+        {
+          "department": "内科",
+          "doctor_id": 13,
+          "doctor_name": "马宁",
+          "hospital_id": 2,
+          "hospital_name": "云岭省星海市中心医院",
+          "id": 13,
+          "name": "马宁",
+          "registration_type": "ordinary",
+          "specialty": "消化内科",
+          "specialty_code": "digestive",
+          "title": "主治医师"
+        },
+        {
+          "department": "内科",
+          "doctor_id": 14,
+          "doctor_name": "梁文清",
+          "hospital_id": 1,
+          "hospital_name": "云岭省星海市第一人民医院",
+          "id": 14,
+          "name": "梁文清",
+          "registration_type": "expert",
+          "specialty": "消化内科",
+          "specialty_code": "digestive",
+          "title": "副主任医师"
+        }
+      ],
+      "schema_version": "2.0",
+      "specialty_code": "digestive",
+      "stage": "recommend",
+      "summary": "35岁男性，饭后上腹胀痛两天，程度轻微，不影响活动，询问挂什么科。",
+      "urgency": "routine"
+    }
+  },
+  {
+    "case": "S06 只给日期直接列出余号",
+    "query": "后天",
+    "result": {
+      "booking_payload": null,
+      "department_confidence": "high",
+      "department_recommendation": "消化内科",
+      "exact_match": true,
+      "knowledge_ids": [
+        "K03",
+        "K01"
+      ],
+      "message": "",
+      "options": [
+        {
+          "available": true,
+          "capacity": 1,
+          "department": "内科",
+          "doctor_id": 2,
+          "doctor_name": "李慧敏",
+          "ends_at": "2026-10-13T09:20:00+08:00",
+          "hospital_id": 1,
+          "hospital_name": "云岭省星海市第一人民医院",
+          "registration_type": "ordinary",
+          "slot_id": "S-02-20261013-0900",
+          "specialty": "消化内科",
+          "specialty_code": "digestive",
+          "starts_at": "2026-10-13T09:00:00+08:00",
+          "status": "available"
+        },
+        {
+          "available": true,
+          "capacity": 1,
+          "department": "内科",
+          "doctor_id": 13,
+          "doctor_name": "马宁",
+          "ends_at": "2026-10-13T09:20:00+08:00",
+          "hospital_id": 2,
+          "hospital_name": "云岭省星海市中心医院",
+          "registration_type": "ordinary",
+          "slot_id": "S-13-20261013-0900",
+          "specialty": "消化内科",
+          "specialty_code": "digestive",
+          "starts_at": "2026-10-13T09:00:00+08:00",
+          "status": "available"
+        },
+        {
+          "available": true,
+          "capacity": 1,
+          "department": "内科",
+          "doctor_id": 14,
+          "doctor_name": "梁文清",
+          "ends_at": "2026-10-13T09:20:00+08:00",
+          "hospital_id": 1,
+          "hospital_name": "云岭省星海市第一人民医院",
+          "registration_type": "expert",
+          "slot_id": "S-14-20261013-0900",
+          "specialty": "消化内科",
+          "specialty_code": "digestive",
+          "starts_at": "2026-10-13T09:00:00+08:00",
+          "status": "available"
+        }
+      ],
+      "possible_causes": [],
+      "preferences": {
+        "date": "2026-10-13"
+      },
+      "profile": {
+        "age": 35,
+        "associated": "不影响活动",
+        "duration": "两天",
+        "location": "上腹部",
+        "main_symptom": "饭后上腹胀痛",
+        "pregnancy": "unknown",
+        "red_flags_status": "unknown",
+        "severity": "轻微"
+      },
+      "questions": [],
+      "rationale": "饭后上腹不适、胀痛，消化系统方向明确，症状轻微无紧急表现，建议消化内科就诊；未提及发热、呕吐、呕血或黑便等，未声称已排除急症。",
+      "recommended_doctors": [
+        {
+          "department": "内科",
+          "doctor_id": 2,
+          "doctor_name": "李慧敏",
+          "hospital_id": 1,
+          "hospital_name": "云岭省星海市第一人民医院",
+          "id": 2,
+          "name": "李慧敏",
+          "registration_type": "ordinary",
+          "specialty": "消化内科",
+          "specialty_code": "digestive",
+          "title": "主治医师"
+        },
+        {
+          "department": "内科",
+          "doctor_id": 13,
+          "doctor_name": "马宁",
+          "hospital_id": 2,
+          "hospital_name": "云岭省星海市中心医院",
+          "id": 13,
+          "name": "马宁",
+          "registration_type": "ordinary",
+          "specialty": "消化内科",
+          "specialty_code": "digestive",
+          "title": "主治医师"
+        },
+        {
+          "department": "内科",
+          "doctor_id": 14,
+          "doctor_name": "梁文清",
+          "hospital_id": 1,
+          "hospital_name": "云岭省星海市第一人民医院",
+          "id": 14,
+          "name": "梁文清",
+          "registration_type": "expert",
+          "specialty": "消化内科",
+          "specialty_code": "digestive",
+          "title": "副主任医师"
+        }
+      ],
+      "schema_version": "2.0",
+      "specialty_code": "digestive",
+      "stage": "booking_options",
+      "summary": "35岁男性，饭后上腹胀痛两天，程度轻微，不影响活动，询问挂什么科。",
+      "urgency": "routine"
+    }
+  }
+]

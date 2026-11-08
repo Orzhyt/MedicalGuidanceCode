@@ -1,0 +1,27 @@
+services:
+  medical-guidance:
+    image: langgenius/dify-api:1.9.1
+    entrypoint: ["/app/api/.venv/bin/python", "-B", "/lab/service.py"]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    env_file: ["./deployment/service-key.env"]
+    ports: ["127.0.0.1:${MEDICAL_HOST_PORT:-8095}:8095"]
+    volumes:
+      - ./service.py:/lab/service.py:ro
+      - medical_state:/state
+    networks:
+      default:
+        aliases: [medical-guidance]
+    healthcheck:
+      test: ["CMD", "/app/api/.venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8095/health',timeout=2)"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+networks:
+  default:
+    external: true
+    name: ${DIFY_DOCKER_NETWORK:-docker_default}
+volumes:
+  medical_state:

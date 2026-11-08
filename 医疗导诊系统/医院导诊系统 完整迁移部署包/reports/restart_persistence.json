@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "result": {
+    "appointment": {
+      "appointment_id": "APT-a0afd576c724ba1e",
+      "created_at": 1791694422.4425087,
+      "department": "内科",
+      "doctor_id": 13,
+      "doctor_name": "马宁",
+      "ends_at": "2026-10-12T09:20:00+08:00",
+      "expires_at": "2026-10-11T12:56:42.442509+08:00",
+      "hold_expires_at": 1791694602.4425087,
+      "hospital_id": 2,
+      "hospital_name": "云岭省星海市中心医院",
+      "patient_id": "DEMO-EXPIRY-A",
+      "slot_id": "S-13-20261012-0900",
+      "specialty": "消化内科",
+      "starts_at": "2026-10-12T09:00:00+08:00",
+      "status": "held",
+      "updated_at": 1791694422.4425087
+    },
+    "code": "APPOINTMENT_STATUS",
+    "message": "已查到这条预约的当前状态。",
+    "ok": true,
+    "schema_version": "2.0",
+    "action": "status",
+    "request_id": ""
+  }
+}

@@ -1,0 +1,3 @@
+患者本轮说：{{#sys.query#}}
+已有病情和预约状态：{{#booking_context.context#}}
+医院医生及服务器时间：{{#compact_catalog.context#}}

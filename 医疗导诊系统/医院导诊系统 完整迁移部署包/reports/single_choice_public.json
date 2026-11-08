@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "chat_calls": 3,
+  "workflow_calls": 5,
+  "records": [
+    {
+      "query": "耳鸣",
+      "answer": "耳鸣多久了？有没有突然听力下降？",
+      "stage": "ask",
+      "booking_model_output": ""
+    },
+    {
+      "query": "三天了，听力正常，想挂14号的专家号",
+      "answer": "建议挂耳鼻喉科。这个科室目前只有普通号，可选：\n1. 10月14日上午09:00，林晓，普通号，中心医院\n您选哪个？也可以调整号别或时间。",
+      "stage": "booking_options",
+      "booking_model_output": "{\"registration_type\":\"expert\",\"date\":\"2026-10-14\"}"
+    },
+    {
+      "query": "那就14号吧，帮我预约",
+      "answer": "已选10月14日上午09:00，林晓，普通号，中心医院。请点击“预约”提交，提交后才会保留号源。",
+      "stage": "booking_ready",
+      "booking_model_output": "{\"date\":\"2026-10-14\",\"intent\":\"choose\",\"selection\":1}"
+    }
+  ],
+  "operations": [
+    {
+      "code": "HELD",
+      "ok": true
+    },
+    {
+      "code": "HELD",
+      "ok": true
+    },
+    {
+      "code": "SLOT_TAKEN",
+      "ok": false
+    },
+    {
+      "code": "CONFIRMED",
+      "ok": true
+    },
+    {
+      "code": "CANCELLED",
+      "ok": true
+    }
+  ],
+  "handover": "后台原样转交咨询私有输入，仅补充患者令牌",
+  "idempotency_passed": true,
+  "conflict_passed": true,
+  "fixture_cleanup": "仅释放本轮创建的预约"
+}
