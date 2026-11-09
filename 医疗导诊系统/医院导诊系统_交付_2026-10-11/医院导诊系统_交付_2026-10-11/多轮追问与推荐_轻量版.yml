@@ -596,6 +596,7 @@ workflow:
           completion_params:
             max_tokens: 1000
             temperature: 0.3
+            thinking: false
           mode: chat
           name: deepseek-flash
           provider: langgenius/deepseek/deepseek

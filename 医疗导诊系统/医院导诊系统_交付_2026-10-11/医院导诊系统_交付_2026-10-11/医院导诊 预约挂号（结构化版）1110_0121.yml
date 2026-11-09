@@ -1,0 +1,750 @@
+app:
+  description: 预约挂号（结构化输出版）：LLM 结构化输出直接产出字段，代码只做决策；确认后提交预约，失败给可约时段。
+  icon: 🏥
+  icon_background: '#E8F3FF'
+  icon_type: emoji
+  mode: advanced-chat
+  name: 医院导诊 预约挂号（结构化版）
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.26@bdf47cb41e9062bba00d26625d2a795c1874011d8ce64bff738c44b5a31787ea
+    version: null
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - description: 医院服务地址（Dify 容器访问宿主机用 host.docker.internal:9090）。
+    id: 01fa82be-e060-4e8f-8716-0a61d905142a
+    name: API_BASE_URL
+    selector:
+    - env
+    - API_BASE_URL
+    value: http://host.docker.internal:9090
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions: []
+      allowed_file_types: []
+      allowed_file_upload_methods: []
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 20
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        knowledge_file_size_limit: 15
+        single_chunk_attachment_limit: 10
+        skill_file_size_limit: 50
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods: []
+      number_limits: 3
+    opening_statement: 您好，请告诉我想预约的医生和时间，例如：帮我约个这周四下午二院儿科孙医生的号。
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions:
+    - 帮我约个这周四下午二院儿科孙医生的号
+    - 我想约张建国医生明天上午
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: code
+      id: start-source-today
+      selected: false
+      source: start
+      sourceHandle: source
+      target: today
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: today-source-hospitals
+      selected: false
+      source: today
+      sourceHandle: source
+      target: hospitals
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: hospitals-source-extract
+      selected: false
+      source: hospitals
+      sourceHandle: source
+      target: extract
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: extract-source-decide
+      selected: false
+      source: extract
+      sourceHandle: source
+      target: decide
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: if-else
+      id: decide-source-route
+      selected: false
+      source: decide
+      sourceHandle: source
+      target: route
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: route-book-create
+      selected: false
+      source: route
+      sourceHandle: book
+      target: create
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: variable-aggregator
+      id: route-false-reply_merge
+      selected: false
+      source: route
+      sourceHandle: 'false'
+      target: reply_merge
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: variable-aggregator
+        targetType: answer
+      id: reply_merge-source-answer_other-target
+      selected: false
+      source: reply_merge
+      sourceHandle: source
+      target: answer_other
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: create-source-1794241659565-target
+      selected: false
+      source: create
+      sourceHandle: source
+      target: '1794241659565'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: 1794241659565-source-reply_merge-target
+      selected: false
+      source: '1794241659565'
+      sourceHandle: source
+      target: reply_merge
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: 读取患者本轮说的话。
+        selected: false
+        title: 接收患者描述
+        type: start
+        variables:
+        - default: ''
+          hint: ''
+          label: patient_id
+          options: []
+          placeholder: ''
+          required: true
+          type: text-input
+          variable: patient_id
+      height: 136
+      id: start
+      position:
+        x: 0
+        y: 300
+      positionAbsolute:
+        x: 0
+        y: 300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        code: "from datetime import datetime, timedelta, timezone\n\nWEEK = [\"周一\"\
+          , \"周二\", \"周三\", \"周四\", \"周五\", \"周六\", \"周日\"]\n\n\ndef main() -> dict:\n\
+          \    try:\n        from zoneinfo import ZoneInfo\n        now = datetime.now(ZoneInfo(\"\
+          Asia/Shanghai\"))\n    except Exception:\n        now = datetime.now(timezone(timedelta(hours=8)))\n\
+          \    return {\"date_iso\": now.strftime(\"%Y-%m-%d\"), \"weekday_cn\": WEEK[now.weekday()],\
+          \ \"now_iso\": now.isoformat(timespec=\"seconds\")}\n"
+        code_language: python3
+        desc: 提供服务器当前日期与星期，供日期换算。
+        outputs:
+          date_iso:
+            children: null
+            type: string
+          now_iso:
+            children: null
+            type: string
+          weekday_cn:
+            children: null
+            type: string
+        selected: false
+        title: 今天是几号
+        type: code
+        variables: []
+      height: 95
+      id: today
+      position:
+        x: 300
+        y: 300
+      positionAbsolute:
+        x: 300
+        y: 300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          type: no-auth
+        body:
+          data: []
+          type: none
+        default_value:
+        - key: body
+          type: string
+          value: '[]'
+        desc: 调医院接口取真实医生名单，解析只从名单匹配，杜绝编造。
+        error_strategy: default-value
+        headers: ''
+        method: GET
+        params: ''
+        retry_config:
+          max_retries: 0
+          retry_enabled: false
+          retry_interval: 1000
+        selected: false
+        ssl_verify: true
+        timeout:
+          connect: 3
+          read: 15
+          write: 15
+        title: 获取医院医生名单
+        type: http-request
+        url: '{{#env.API_BASE_URL#}}/api/hospitals'
+      height: 190
+      id: hospitals
+      position:
+        x: 600
+        y: 300
+      positionAbsolute:
+        x: 600
+        y: 300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        context:
+          enabled: false
+        default_value:
+        - key: text
+          type: string
+          value: '{}'
+        desc: 用 Dify 结构化输出
+        error_strategy: default-value
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 10
+        model:
+          completion_params:
+            max_tokens: 1500
+            temperature: 0.1
+            thinking: false
+          mode: chat
+          name: deepseek-v4-flash
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: extract-system
+          role: system
+          text: '你是医院挂号助理，负责从对话中解析预约信息。规则：
+
+            1. 医生必须从「医院医生名单」中查找，绝不编造。医院简称要匹配名单（如“二院”→云岭省星海市第二人民医院、“一院”→第一人民医院）。名字模糊或多个候选时
+            doctor_id 输出 null，并在 question 里向患者确认。
+
+            2. 日期以「今天是」为准换算成 YYYY-MM-DD（今天/明天/后天/这周四/下周一……）；没说日期时 slot_date 为 null。
+
+            3. 可约时段只有上午和下午：period 上午=morning、下午=afternoon、没说=unknown。患者提到具体时刻（如 8点20）时按
+            12 点归并，不输出具体时刻。
+
+            4. intent：首次提出=new；修改信息=change；明确同意当前草稿（“对/是的/就他/确认/可以”）=confirm；取消=cancel；其他=unknown。
+
+            5. 每轮结合对话历史输出完整字段——即使只说了一句“确认”，也要把医生、日期、时段完整填出。'
+        - id: extract-user
+          role: user
+          text: '今天是：{{#today.date_iso#}}（{{#today.weekday_cn#}}）
+
+
+            患者本轮说：{{#sys.query#}}
+
+
+            医院医生名单（JSON）：
+
+            {{#hospitals.body#}}'
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        structured_output:
+          schema:
+            properties:
+              department_name:
+                type: string
+              doctor_id:
+                type:
+                - integer
+                - 'null'
+              doctor_name:
+                type: string
+              hospital_name:
+                type: string
+              intent:
+                enum:
+                - new
+                - change
+                - confirm
+                - cancel
+                - unknown
+                type: string
+              period:
+                enum:
+                - morning
+                - afternoon
+                - unknown
+                type: string
+              question:
+                type: string
+              reason:
+                type: string
+              slot_date:
+                type:
+                - string
+                - 'null'
+            required:
+            - intent
+            - doctor_id
+            - doctor_name
+            - hospital_name
+            - department_name
+            - slot_date
+            - period
+            - question
+            type: object
+        structured_output_enabled: true
+        title: 解析预约信息（结构化输出）
+        type: llm
+        vision:
+          enabled: false
+      height: 180
+      id: extract
+      position:
+        x: 900
+        y: 300
+      positionAbsolute:
+        x: 900
+        y: 300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        code: "WEEK = [\"周一\", \"周二\", \"周三\", \"周四\", \"周五\", \"周六\", \"周日\"]\n\n\
+          \ndef week_of(d: str) -> str:\n    try:\n        from datetime import date\n\
+          \        return WEEK[date.fromisoformat(d).weekday()]\n    except (ValueError,\
+          \ TypeError):\n        return \"\"\n\n\ndef out(stage, reply, doctor_id,\
+          \ slot_date, start_time, hospital_name, department_name, doctor_name):\n\
+          \    return {\"stage\": stage, \"reply\": reply, \"doctor_id\": int(doctor_id\
+          \ or 0), \"slot_date\": slot_date,\n            \"start_time\": start_time,\
+          \ \"hospital_name\": hospital_name, \"department_name\": department_name,\n\
+          \            \"doctor_name\": doctor_name}\n\n\ndef main(intent: str, doctor_id:\
+          \ int, doctor_name: str, hospital_name: str, department_name: str,\n   \
+          \      slot_date: str, period: str, question: str) -> dict:\n    intent\
+          \ = intent or \"unknown\"\n    doctor_name = str(doctor_name or \"\")\n\
+          \    hospital_name = str(hospital_name or \"\")\n    department_name = str(department_name\
+          \ or \"\")\n    slot_date = str(slot_date or \"\")\n    period = period\
+          \ or \"unknown\"\n    question = str(question or \"\")\n    if intent ==\
+          \ \"cancel\":\n        return out(\"cancel\", \"好的，已取消本次预约操作。需要再约的话直接告诉我医生和时间。\"\
+          , 0, \"\", \"\", \"\", \"\", \"\")\n    if doctor_id is None:\n        if\
+          \ doctor_name:\n            return out(\"not_found\", question or \"抱歉，没在医生名单里找到您说的医生，请换个名字或让我列出可选医生。\"\
+          ,\n                       0, \"\", \"\", hospital_name, department_name,\
+          \ doctor_name)\n        return out(\"ask\", question or \"请问您想约哪位医生？可以说医生姓名、医院或科室。\"\
+          , 0, \"\", \"\", \"\", \"\", \"\")\n    if not slot_date:\n        return\
+          \ out(\"ask\", question or \"请问想约哪一天？\", doctor_id, \"\", \"\", hospital_name,\
+          \ department_name, doctor_name)\n    if period not in (\"morning\", \"afternoon\"\
+          ):\n        return out(\"ask\", question or \"请问想约上午还是下午？\", doctor_id,\
+          \ slot_date, \"\", hospital_name, department_name, doctor_name)\n    if\
+          \ intent != \"confirm\":\n        period_cn = \"上午\" if period == \"morning\"\
+          \ else \"下午\"\n        reply = \"请确认：您要预约 {} · {} · {} 医生，{}（{}）{} 的号吗？回复“确认”即可。\"\
+          .format(\n            hospital_name, department_name, doctor_name, slot_date,\
+          \ week_of(slot_date), period_cn)\n        return out(\"confirm\", reply,\
+          \ doctor_id, slot_date, \"\", hospital_name, department_name, doctor_name)\n\
+          \    start_time = \"08:00:00\" if period == \"morning\" else \"14:00:00\"\
+          \n    return out(\"book\", None, doctor_id, slot_date, start_time, hospital_name,\
+          \ department_name, doctor_name)\n"
+        code_language: python3
+        desc: 基于结构化字段判断：追问/未找到/确认/预约/取消；无 JSON 解析。
+        outputs:
+          department_name:
+            children: null
+            type: string
+          doctor_id:
+            children: null
+            type: number
+          doctor_name:
+            children: null
+            type: string
+          hospital_name:
+            children: null
+            type: string
+          reply:
+            children: null
+            type: string
+          slot_date:
+            children: null
+            type: string
+          stage:
+            children: null
+            type: string
+          start_time:
+            children: null
+            type: string
+        selected: false
+        title: 校验并决定下一步
+        type: code
+        variables:
+        - value_selector:
+          - extract
+          - structured_output
+          - intent
+          value_type: string
+          variable: intent
+        - value_selector:
+          - extract
+          - structured_output
+          - doctor_id
+          value_type: number
+          variable: doctor_id
+        - value_selector:
+          - extract
+          - structured_output
+          - doctor_name
+          value_type: string
+          variable: doctor_name
+        - value_selector:
+          - extract
+          - structured_output
+          - hospital_name
+          value_type: string
+          variable: hospital_name
+        - value_selector:
+          - extract
+          - structured_output
+          - department_name
+          value_type: string
+          variable: department_name
+        - value_selector:
+          - extract
+          - structured_output
+          - slot_date
+          value_type: string
+          variable: slot_date
+        - value_selector:
+          - extract
+          - structured_output
+          - period
+          value_type: string
+          variable: period
+        - value_selector:
+          - extract
+          - structured_output
+          - question
+          value_type: string
+          variable: question
+      height: 95
+      id: decide
+      position:
+        x: 1200
+        y: 300
+      positionAbsolute:
+        x: 1200
+        y: 300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        cases:
+        - case_id: book
+          conditions:
+          - comparison_operator: is
+            id: routebook
+            value: book
+            varType: string
+            variable_selector:
+            - decide
+            - stage
+          id: book
+          logical_operator: and
+        desc: 信息齐且已确认才提交；否则把 decide 的话术直接回复患者。
+        selected: false
+        title: 是否提交预约
+        type: if-else
+      height: 167
+      id: route
+      position:
+        x: 1500
+        y: 300
+      positionAbsolute:
+        x: 1500
+        y: 300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          type: no-auth
+        body:
+          data:
+          - id: key-value-567
+            key: ''
+            type: text
+            value: '{
+
+                "doctor_id": {{#decide.doctor_id#}},
+
+                "slot_date": "{{#decide.slot_date#}}",
+
+                "start_time": "{{#decide.start_time#}}",
+
+                "patient_id": "{{#start.patient_id#}}"
+
+              }'
+          type: json
+        default_value:
+        - key: body
+          type: string
+          value: '{"success": false, "message": "医院服务暂时不可用", "available_slots": []}'
+        desc: 调用医院接口创建预约
+        error_strategy: default-value
+        headers: Content-Type:application/json
+        method: POST
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 1000
+        selected: false
+        ssl_verify: false
+        timeout:
+          connect: 3
+          read: 15
+          write: 15
+        title: 提交预约
+        type: http-request
+        url: '{{#env.API_BASE_URL#}}/api/appointments'
+      height: 174
+      id: create
+      position:
+        x: 1801.0463386122256
+        y: 130.49314481947425
+      positionAbsolute:
+        x: 1801.0463386122256
+        y: 130.49314481947425
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        advanced_settings:
+          group_enabled: false
+          groups:
+          - groupId: d35041be-a2bb-44bd-9239-13f01c27c834
+            group_name: Group1
+            output_type: string
+            variables:
+            - - decide
+              - reply
+            - - '1794241659565'
+              - text
+        desc: 回复取第一个非空。
+        output_type: string
+        selected: false
+        title: 汇总本轮回复
+        type: variable-aggregator
+        variables:
+        - - '1794241659565'
+          - text
+        - - decide
+          - reply
+      height: 163
+      id: reply_merge
+      position:
+        x: 2400
+        y: 300
+      positionAbsolute:
+        x: 2400
+        y: 300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        answer: '{{#reply_merge.output#}}'
+        desc: 只回复患者需要的信息。
+        selected: false
+        title: 回复患者
+        type: answer
+        variables: []
+      height: 129
+      id: answer_other
+      position:
+        x: 2709.8650227048365
+        y: 309.4170475100292
+      positionAbsolute:
+        x: 2709.8650227048365
+        y: 309.4170475100292
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: 告知预约结果
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: deepseek-v4-flash
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 89e73637-e69b-4808-8af8-dc084e378546
+          role: system
+          text: '你是医院挂号助理，负责从对话中解析预约结果信息。预约结果有以下几种可能：
+
+            1. 预约成功，告知用户“预约成功，请按时就医。”；
+
+            2. 预约失败，由于档期约满或非档期时间，告知用户原因，并建议修改预约时间，并提供7天内可预约时间建议；
+
+            3. 服务调用失败，告知用户“当前服务异常，请稍后再尝试使用此功能”。'
+        - id: 45001b64-550f-4dbb-b702-060e0aee29d3
+          role: user
+          text: '用户预约的日期：{{#decide.slot_date#}}
+
+            预约接口返回结果：{{#create.body#}}'
+        selected: false
+        structured_output_enabled: true
+        title: 模型处理预约结果
+        type: llm
+        vision:
+          enabled: false
+      height: 115
+      id: '1794241659565'
+      position:
+        x: 2077.8688387593315
+        y: 137.48760132844166
+      positionAbsolute:
+        x: 2077.8688387593315
+        y: 137.48760132844166
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    viewport:
+      x: -1631.4518598931945
+      y: 184.27714388787473
+      zoom: 0.7226812949866304
+  rag_pipeline_variables: []
